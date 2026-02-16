@@ -60,15 +60,55 @@
       }
     };
 
-    // Lucide icons
-    const { 
-      Users, Briefcase, BarChart3, Settings, Search, Plus, X, 
-      TrendingUp, Target, Award, Filter, Download, ChevronDown, ChevronRight 
-    } = lucide;
+    // Lucide icon compatibility helpers (works with non-React UMD builds)
+    const iconFallback = (props = {}) => React.createElement('span', {
+      ...props,
+      style: { display: 'inline-block', ...props.style }
+    });
+    const toIconComponent = (name) => {
+      const candidate = lucide?.[name];
+      return typeof candidate === 'function' ? candidate : iconFallback;
+    };
+
+    const Users = toIconComponent('Users');
+    const Briefcase = toIconComponent('Briefcase');
+    const BarChart3 = toIconComponent('BarChart3');
+    const Settings = toIconComponent('Settings');
+    const Search = toIconComponent('Search');
+    const Plus = toIconComponent('Plus');
+    const X = toIconComponent('X');
+    const TrendingUp = toIconComponent('TrendingUp');
+    const Target = toIconComponent('Target');
+    const Award = toIconComponent('Award');
+    const Filter = toIconComponent('Filter');
+    const Download = toIconComponent('Download');
+    const ChevronDown = toIconComponent('ChevronDown');
+    const ChevronRight = toIconComponent('ChevronRight');
   </script>
 
   <script type="text/babel">
     const { useState, useEffect } = React;
+
+    const SkillsMarketplace = () => {
+      const [activeTab, setActiveTab] = useState('self-service');
+      const [employees, setEmployees] = useState([]);
+      const [projects, setProjects] = useState([]);
+      const [searchQuery, setSearchQuery] = useState('');
+      const [selectedDepartment, setSelectedDepartment] = useState('all');
+      const [selectedTeam, setSelectedTeam] = useState('all');
+      const [showAddProject, setShowAddProject] = useState(false);
+      const [showAddEmployee, setShowAddEmployee] = useState(false);
+      const [expandedSkills, setExpandedSkills] = useState({});
+      const [isSubmitting, setIsSubmitting] = useState(false);
+      const [submissionSuccess, setSubmissionSuccess] = useState(false);
+      const [skillInputs, setSkillInputs] = useState([{ name: '', level: 'Intermediate', category: 'General' }]);
+
+      useEffect(() => {
+        const loadData = async () => {
+          const loadDemoEmployees = async () => {
+            try {
+              const demoEmployees = [
+            {
               id: 1,
               name: "Sarah Chen",
               department: "Engineering",
@@ -568,12 +608,42 @@
           console.error('Error setting demo projects:', error);
         }
       };
-      
-      loadData();
-    };
-    
-    loadData();
-  }, []);
+
+          let hasEmployees = false;
+          let hasProjects = false;
+
+          try {
+            if (window.storage) {
+              const [storedEmployees, storedProjects] = await Promise.all([
+                window.storage.get('employees'),
+                window.storage.get('projects')
+              ]);
+
+              if (storedEmployees?.value) {
+                setEmployees(JSON.parse(storedEmployees.value));
+                hasEmployees = true;
+              }
+
+              if (storedProjects?.value) {
+                setProjects(JSON.parse(storedProjects.value));
+                hasProjects = true;
+              }
+            }
+          } catch (error) {
+            console.error('Error loading stored data:', error);
+          }
+
+          if (!hasEmployees) {
+            await loadDemoEmployees();
+          }
+
+          if (!hasProjects) {
+            await loadDemoProjects();
+          }
+        };
+
+        loadData();
+      }, []);
   
   // Analytics calculations
   const getSkillAnalytics = () => {
