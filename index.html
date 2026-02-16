@@ -96,549 +96,44 @@
       const [searchQuery, setSearchQuery] = useState('');
       const [selectedDepartment, setSelectedDepartment] = useState('all');
       const [selectedTeam, setSelectedTeam] = useState('all');
+      const [analyticsDepartment, setAnalyticsDepartment] = useState('all');
+      const [analyticsTeam, setAnalyticsTeam] = useState('all');
       const [showAddProject, setShowAddProject] = useState(false);
       const [showAddEmployee, setShowAddEmployee] = useState(false);
+      const [showInterestModal, setShowInterestModal] = useState(false);
       const [expandedSkills, setExpandedSkills] = useState({});
       const [isSubmitting, setIsSubmitting] = useState(false);
       const [submissionSuccess, setSubmissionSuccess] = useState(false);
       const [skillInputs, setSkillInputs] = useState([{ name: '', level: 'Intermediate', category: 'General' }]);
+      const [interests, setInterests] = useState([]);
 
       useEffect(() => {
         const loadData = async () => {
-          const loadDemoEmployees = async () => {
-            try {
-              const demoEmployees = [
-            {
-              id: 1,
-              name: "Sarah Chen",
-              department: "Engineering",
-              team: "Backend",
-              role: "Senior Software Engineer",
-              availability: "Available",
-              skills: [
-                { name: "Python", level: "Expert", category: "Programming" },
-                { name: "AWS", level: "Advanced", category: "Cloud" },
-                { name: "PostgreSQL", level: "Advanced", category: "Database" },
-                { name: "API Design", level: "Expert", category: "Architecture" },
-                { name: "Django", level: "Advanced", category: "Framework" }
-              ]
-            },
-            {
-              id: 2,
-              name: "Marcus Johnson",
-              department: "Engineering",
-              team: "Frontend",
-              role: "Staff Engineer",
-              availability: "Partially Available",
-              skills: [
-                { name: "React", level: "Expert", category: "Programming" },
-                { name: "TypeScript", level: "Expert", category: "Programming" },
-                { name: "UI/UX Design", level: "Advanced", category: "Design" },
-                { name: "Accessibility", level: "Advanced", category: "Standards" },
-                { name: "CSS", level: "Expert", category: "Design" }
-              ]
-            },
-            {
-              id: 3,
-              name: "Priya Patel",
-              department: "Product",
-              team: "Analytics",
-              role: "Product Manager",
-              availability: "Available",
-              skills: [
-                { name: "Data Analysis", level: "Expert", category: "Analytics" },
-                { name: "SQL", level: "Advanced", category: "Database" },
-                { name: "Product Strategy", level: "Expert", category: "Strategy" },
-                { name: "A/B Testing", level: "Advanced", category: "Analytics" },
-                { name: "Roadmap Planning", level: "Expert", category: "Strategy" }
-              ]
-            },
-            {
-              id: 4,
-              name: "James Wilson",
-              department: "Engineering",
-              team: "DevOps",
-              role: "DevOps Engineer",
-              availability: "Busy",
-              skills: [
-                { name: "Kubernetes", level: "Expert", category: "Cloud" },
-                { name: "Docker", level: "Expert", category: "Cloud" },
-                { name: "CI/CD", level: "Advanced", category: "DevOps" },
-                { name: "Terraform", level: "Advanced", category: "Infrastructure" },
-                { name: "AWS", level: "Advanced", category: "Cloud" }
-              ]
-            },
-            {
-              id: 5,
-              name: "Lisa Anderson",
-              department: "Design",
-              team: "Product Design",
-              role: "Senior Designer",
-              availability: "Available",
-              skills: [
-                { name: "Figma", level: "Expert", category: "Design" },
-                { name: "User Research", level: "Advanced", category: "Research" },
-                { name: "Prototyping", level: "Expert", category: "Design" },
-                { name: "Design Systems", level: "Advanced", category: "Design" },
-                { name: "Interaction Design", level: "Expert", category: "Design" }
-              ]
-            },
-            {
-              id: 6,
-              name: "Alex Kim",
-              department: "Engineering",
-              team: "Backend",
-              role: "Software Engineer",
-              availability: "Available",
-              skills: [
-                { name: "Java", level: "Advanced", category: "Programming" },
-                { name: "Spring Boot", level: "Advanced", category: "Framework" },
-                { name: "MongoDB", level: "Intermediate", category: "Database" },
-                { name: "Microservices", level: "Advanced", category: "Architecture" },
-                { name: "Redis", level: "Intermediate", category: "Database" }
-              ]
-            },
-            {
-              id: 7,
-              name: "Emma Rodriguez",
-              department: "Product",
-              team: "Growth",
-              role: "Growth PM",
-              availability: "Partially Available",
-              skills: [
-                { name: "Growth Marketing", level: "Expert", category: "Marketing" },
-                { name: "Analytics", level: "Advanced", category: "Analytics" },
-                { name: "Experimentation", level: "Expert", category: "Analytics" },
-                { name: "SQL", level: "Intermediate", category: "Database" },
-                { name: "Google Analytics", level: "Advanced", category: "Analytics" }
-              ]
-            },
-            {
-              id: 8,
-              name: "David Lee",
-              department: "Engineering",
-              team: "Frontend",
-              role: "Senior Software Engineer",
-              availability: "Available",
-              skills: [
-                { name: "Vue.js", level: "Expert", category: "Programming" },
-                { name: "JavaScript", level: "Expert", category: "Programming" },
-                { name: "CSS", level: "Advanced", category: "Design" },
-                { name: "Performance Optimization", level: "Advanced", category: "Engineering" },
-                { name: "Webpack", level: "Advanced", category: "DevOps" }
-              ]
-            },
-            {
-              id: 9,
-              name: "Michael Torres",
-              department: "Marketing",
-              team: "Content",
-              role: "Content Marketing Manager",
-              availability: "Available",
-              skills: [
-                { name: "Content Strategy", level: "Expert", category: "Marketing" },
-                { name: "SEO", level: "Advanced", category: "Marketing" },
-                { name: "Copywriting", level: "Expert", category: "Marketing" },
-                { name: "Social Media", level: "Advanced", category: "Marketing" }
-              ]
-            },
-            {
-              id: 10,
-              name: "Rachel Green",
-              department: "Sales",
-              team: "Enterprise",
-              role: "Senior Account Executive",
-              availability: "Busy",
-              skills: [
-                { name: "Enterprise Sales", level: "Expert", category: "Sales" },
-                { name: "Negotiation", level: "Expert", category: "Sales" },
-                { name: "Salesforce", level: "Advanced", category: "Tools" },
-                { name: "Account Management", level: "Advanced", category: "Sales" }
-              ]
-            },
-            {
-              id: 11,
-              name: "Kevin Nguyen",
-              department: "Engineering",
-              team: "Mobile",
-              role: "iOS Engineer",
-              availability: "Available",
-              skills: [
-                { name: "Swift", level: "Expert", category: "Programming" },
-                { name: "iOS Development", level: "Expert", category: "Programming" },
-                { name: "UIKit", level: "Advanced", category: "Framework" },
-                { name: "SwiftUI", level: "Advanced", category: "Framework" }
-              ]
-            },
-            {
-              id: 12,
-              name: "Amanda Foster",
-              department: "Design",
-              team: "Brand",
-              role: "Brand Designer",
-              availability: "Available",
-              skills: [
-                { name: "Branding", level: "Expert", category: "Design" },
-                { name: "Illustration", level: "Advanced", category: "Design" },
-                { name: "Adobe Creative Suite", level: "Expert", category: "Tools" },
-                { name: "Motion Design", level: "Intermediate", category: "Design" }
-              ]
-            },
-            {
-              id: 13,
-              name: "Chris Martinez",
-              department: "Data",
-              team: "Analytics",
-              role: "Data Scientist",
-              availability: "Partially Available",
-              skills: [
-                { name: "Machine Learning", level: "Expert", category: "Analytics" },
-                { name: "Python", level: "Expert", category: "Programming" },
-                { name: "Statistics", level: "Expert", category: "Analytics" },
-                { name: "TensorFlow", level: "Advanced", category: "Framework" },
-                { name: "SQL", level: "Advanced", category: "Database" }
-              ]
-            },
-            {
-              id: 14,
-              name: "Jessica Wu",
-              department: "Product",
-              team: "Platform",
-              role: "Senior Product Manager",
-              availability: "Available",
-              skills: [
-                { name: "Product Strategy", level: "Expert", category: "Strategy" },
-                { name: "API Products", level: "Advanced", category: "Strategy" },
-                { name: "Technical Writing", level: "Advanced", category: "Documentation" },
-                { name: "Roadmap Planning", level: "Expert", category: "Strategy" }
-              ]
-            },
-            {
-              id: 15,
-              name: "Robert Jackson",
-              department: "Engineering",
-              team: "Security",
-              role: "Security Engineer",
-              availability: "Busy",
-              skills: [
-                { name: "Security Auditing", level: "Expert", category: "Security" },
-                { name: "Penetration Testing", level: "Advanced", category: "Security" },
-                { name: "Python", level: "Advanced", category: "Programming" },
-                { name: "Cryptography", level: "Advanced", category: "Security" }
-              ]
-            },
-            {
-              id: 16,
-              name: "Nina Patel",
-              department: "Data",
-              team: "Engineering",
-              role: "Data Engineer",
-              availability: "Available",
-              skills: [
-                { name: "Apache Spark", level: "Expert", category: "Framework" },
-                { name: "Python", level: "Advanced", category: "Programming" },
-                { name: "SQL", level: "Expert", category: "Database" },
-                { name: "Data Pipelines", level: "Expert", category: "Architecture" },
-                { name: "AWS", level: "Advanced", category: "Cloud" }
-              ]
-            },
-            {
-              id: 17,
-              name: "Tom Bradley",
-              department: "Engineering",
-              team: "Mobile",
-              role: "Android Engineer",
-              availability: "Available",
-              skills: [
-                { name: "Kotlin", level: "Expert", category: "Programming" },
-                { name: "Android Development", level: "Expert", category: "Programming" },
-                { name: "Jetpack Compose", level: "Advanced", category: "Framework" },
-                { name: "Java", level: "Advanced", category: "Programming" }
-              ]
-            },
-            {
-              id: 18,
-              name: "Sophie Chen",
-              department: "Marketing",
-              team: "Performance",
-              role: "Performance Marketing Manager",
-              availability: "Partially Available",
-              skills: [
-                { name: "Paid Advertising", level: "Expert", category: "Marketing" },
-                { name: "Google Ads", level: "Expert", category: "Marketing" },
-                { name: "Facebook Ads", level: "Advanced", category: "Marketing" },
-                { name: "Analytics", level: "Advanced", category: "Analytics" }
-              ]
-            },
-            {
-              id: 19,
-              name: "Daniel Kim",
-              department: "Engineering",
-              team: "Infrastructure",
-              role: "Site Reliability Engineer",
-              availability: "Available",
-              skills: [
-                { name: "Kubernetes", level: "Expert", category: "Cloud" },
-                { name: "Monitoring", level: "Expert", category: "DevOps" },
-                { name: "Python", level: "Advanced", category: "Programming" },
-                { name: "Incident Management", level: "Expert", category: "DevOps" }
-              ]
-            },
-            {
-              id: 20,
-              name: "Maria Garcia",
-              department: "Design",
-              team: "UX Research",
-              role: "UX Researcher",
-              availability: "Available",
-              skills: [
-                { name: "User Research", level: "Expert", category: "Research" },
-                { name: "Usability Testing", level: "Expert", category: "Research" },
-                { name: "User Interviews", level: "Expert", category: "Research" },
-                { name: "Data Analysis", level: "Advanced", category: "Analytics" }
-              ]
-            },
-            {
-              id: 21,
-              name: "Brian Thompson",
-              department: "Sales",
-              team: "SMB",
-              role: "Account Executive",
-              availability: "Available",
-              skills: [
-                { name: "SMB Sales", level: "Advanced", category: "Sales" },
-                { name: "Customer Success", level: "Advanced", category: "Sales" },
-                { name: "Salesforce", level: "Intermediate", category: "Tools" },
-                { name: "Prospecting", level: "Advanced", category: "Sales" }
-              ]
-            },
-            {
-              id: 22,
-              name: "Laura Mitchell",
-              department: "Product",
-              team: "Core",
-              role: "Product Manager",
-              availability: "Partially Available",
-              skills: [
-                { name: "Product Management", level: "Advanced", category: "Strategy" },
-                { name: "Agile", level: "Advanced", category: "Management" },
-                { name: "User Stories", level: "Advanced", category: "Documentation" },
-                { name: "Stakeholder Management", level: "Advanced", category: "Management" }
-              ]
-            },
-            {
-              id: 23,
-              name: "Jason Park",
-              department: "Engineering",
-              team: "Backend",
-              role: "Software Engineer",
-              availability: "Available",
-              skills: [
-                { name: "Node.js", level: "Advanced", category: "Programming" },
-                { name: "JavaScript", level: "Advanced", category: "Programming" },
-                { name: "GraphQL", level: "Advanced", category: "Architecture" },
-                { name: "MongoDB", level: "Advanced", category: "Database" }
-              ]
-            },
-            {
-              id: 24,
-              name: "Emily Davis",
-              department: "Data",
-              team: "BI",
-              role: "Business Intelligence Analyst",
-              availability: "Available",
-              skills: [
-                { name: "Tableau", level: "Expert", category: "Analytics" },
-                { name: "SQL", level: "Advanced", category: "Database" },
-                { name: "Data Visualization", level: "Expert", category: "Analytics" },
-                { name: "Business Analysis", level: "Advanced", category: "Analytics" }
-              ]
-            },
-            {
-              id: 25,
-              name: "Andrew Wilson",
-              department: "Engineering",
-              team: "Frontend",
-              role: "Frontend Engineer",
-              availability: "Busy",
-              skills: [
-                { name: "React", level: "Advanced", category: "Programming" },
-                { name: "JavaScript", level: "Advanced", category: "Programming" },
-                { name: "HTML", level: "Expert", category: "Programming" },
-                { name: "CSS", level: "Advanced", category: "Design" }
-              ]
-            },
-            {
-              id: 26,
-              name: "Olivia Brown",
-              department: "Marketing",
-              team: "Brand",
-              role: "Marketing Manager",
-              availability: "Available",
-              skills: [
-                { name: "Brand Strategy", level: "Expert", category: "Marketing" },
-                { name: "Campaign Management", level: "Advanced", category: "Marketing" },
-                { name: "Content Marketing", level: "Advanced", category: "Marketing" },
-                { name: "Project Management", level: "Advanced", category: "Management" }
-              ]
-            },
-            {
-              id: 27,
-              name: "Ryan Lee",
-              department: "Engineering",
-              team: "QA",
-              role: "QA Engineer",
-              availability: "Available",
-              skills: [
-                { name: "Test Automation", level: "Expert", category: "Engineering" },
-                { name: "Selenium", level: "Advanced", category: "Tools" },
-                { name: "Python", level: "Advanced", category: "Programming" },
-                { name: "Manual Testing", level: "Expert", category: "Engineering" }
-              ]
-            },
-            {
-              id: 28,
-              name: "Hannah Clark",
-              department: "Design",
-              team: "Product Design",
-              role: "Product Designer",
-              availability: "Partially Available",
-              skills: [
-                { name: "UI Design", level: "Advanced", category: "Design" },
-                { name: "Figma", level: "Advanced", category: "Design" },
-                { name: "Prototyping", level: "Advanced", category: "Design" },
-                { name: "Visual Design", level: "Advanced", category: "Design" }
-              ]
-            },
-            {
-              id: 29,
-              name: "Steven Harris",
-              department: "Data",
-              team: "Analytics",
-              role: "Analytics Engineer",
-              availability: "Available",
-              skills: [
-                { name: "SQL", level: "Expert", category: "Database" },
-                { name: "dbt", level: "Expert", category: "Tools" },
-                { name: "Python", level: "Advanced", category: "Programming" },
-                { name: "Data Modeling", level: "Expert", category: "Architecture" }
-              ]
-            },
-            {
-              id: 30,
-              name: "Victoria Adams",
-              department: "Sales",
-              team: "Operations",
-              role: "Sales Operations Manager",
-              availability: "Available",
-              skills: [
-                { name: "Salesforce Administration", level: "Expert", category: "Tools" },
-                { name: "Sales Analytics", level: "Advanced", category: "Analytics" },
-                { name: "Process Optimization", level: "Advanced", category: "Management" },
-                { name: "Data Analysis", level: "Advanced", category: "Analytics" }
-              ]
-            }
-          ];
-          setEmployees(demoEmployees);
-          if (window.storage) {
-            await window.storage.set('employees', JSON.stringify(demoEmployees));
-          }
-        } catch (error) {
-          console.error('Error setting demo employees:', error);
-        }
-      };
-      
-      const loadDemoProjects = async () => {
-        try {
-          const demoProjects = [
-            {
-              id: 1,
-              title: "API Gateway Redesign",
-              department: "Engineering",
-              duration: "6 weeks",
-              requiredSkills: ["Python", "API Design", "AWS"],
-              status: "Open"
-            },
-            {
-              id: 2,
-              title: "Design System V2",
-              department: "Design",
-              duration: "8 weeks",
-              requiredSkills: ["Figma", "Design Systems", "React"],
-              status: "Open"
-            },
-            {
-              id: 3,
-              title: "Mobile App Performance Optimization",
-              department: "Engineering",
-              duration: "4 weeks",
-              requiredSkills: ["iOS Development", "Android Development", "Performance Optimization"],
-              status: "Open"
-            },
-            {
-              id: 4,
-              title: "Customer Analytics Dashboard",
-              department: "Data",
-              duration: "5 weeks",
-              requiredSkills: ["SQL", "Data Visualization", "Tableau"],
-              status: "Open"
-            },
-            {
-              id: 5,
-              title: "Security Audit & Remediation",
-              department: "Engineering",
-              duration: "3 weeks",
-              requiredSkills: ["Security Auditing", "Penetration Testing", "Python"],
-              status: "Open"
-            },
-            {
-              id: 6,
-              title: "Brand Refresh Campaign",
-              department: "Marketing",
-              duration: "10 weeks",
-              requiredSkills: ["Brand Strategy", "Branding", "Content Marketing"],
-              status: "Open"
-            }
-          ];
-          setProjects(demoProjects);
-          if (window.storage) {
-            await window.storage.set('projects', JSON.stringify(demoProjects));
-          }
-        } catch (error) {
-          console.error('Error setting demo projects:', error);
-        }
-      };
-
-          let hasEmployees = false;
-          let hasProjects = false;
-
           try {
             if (window.storage) {
-              const [storedEmployees, storedProjects] = await Promise.all([
+              const [storedEmployees, storedProjects, storedInterests] = await Promise.all([
                 window.storage.get('employees'),
-                window.storage.get('projects')
+                window.storage.get('projects'),
+                window.storage.get('interests')
               ]);
 
-              if (storedEmployees?.value) {
-                setEmployees(JSON.parse(storedEmployees.value));
-                hasEmployees = true;
-              }
+              const parsedEmployees = storedEmployees?.value ? JSON.parse(storedEmployees.value) : [];
+              const parsedProjects = storedProjects?.value ? JSON.parse(storedProjects.value) : [];
+              const parsedInterests = storedInterests?.value ? JSON.parse(storedInterests.value) : [];
 
-              if (storedProjects?.value) {
-                setProjects(JSON.parse(storedProjects.value));
-                hasProjects = true;
-              }
+              setEmployees(Array.isArray(parsedEmployees) ? parsedEmployees : []);
+              setProjects(Array.isArray(parsedProjects) ? parsedProjects : []);
+              setInterests(Array.isArray(parsedInterests) ? parsedInterests : []);
+
+              if (!storedEmployees?.value) await window.storage.set('employees', JSON.stringify([]));
+              if (!storedProjects?.value) await window.storage.set('projects', JSON.stringify([]));
+              if (!storedInterests?.value) await window.storage.set('interests', JSON.stringify([]));
             }
           } catch (error) {
             console.error('Error loading stored data:', error);
-          }
-
-          if (!hasEmployees) {
-            await loadDemoEmployees();
-          }
-
-          if (!hasProjects) {
-            await loadDemoProjects();
+            setEmployees([]);
+            setProjects([]);
+            setInterests([]);
           }
         };
 
@@ -646,77 +141,88 @@
       }, []);
   
   // Analytics calculations
-  const getSkillAnalytics = () => {
-    const allSkills = employees.flatMap(emp => emp.skills);
+  const getSkillAnalytics = (employeeSubset) => {
+    const allSkills = employeeSubset.flatMap(emp => emp.skills || []);
     const skillMap = {};
     const categoryMap = {};
     const departmentSkills = {};
     const teamSkills = {};
-    
+
     allSkills.forEach(skill => {
-      // Overall skills
       if (!skillMap[skill.name]) {
         skillMap[skill.name] = { count: 0, levels: [], category: skill.category };
       }
       skillMap[skill.name].count++;
       skillMap[skill.name].levels.push(skill.level);
-      
-      // Categories
+
       if (!categoryMap[skill.category]) {
         categoryMap[skill.category] = 0;
       }
       categoryMap[skill.category]++;
     });
-    
-    // Department and team breakdown
-    employees.forEach(emp => {
+
+    employeeSubset.forEach(emp => {
       if (!departmentSkills[emp.department]) {
         departmentSkills[emp.department] = {};
       }
       if (!teamSkills[emp.team]) {
         teamSkills[emp.team] = { department: emp.department, skills: {} };
       }
-      
-      emp.skills.forEach(skill => {
+
+      (emp.skills || []).forEach(skill => {
         if (!departmentSkills[emp.department][skill.name]) {
           departmentSkills[emp.department][skill.name] = 0;
         }
         departmentSkills[emp.department][skill.name]++;
-        
+
         if (!teamSkills[emp.team].skills[skill.name]) {
           teamSkills[emp.team].skills[skill.name] = 0;
         }
         teamSkills[emp.team].skills[skill.name]++;
       });
     });
-    
+
     return { skillMap, categoryMap, departmentSkills, teamSkills };
   };
-  
-  const analytics = getSkillAnalytics();
-  
-  // Get top skills
+
+  const departments = [...new Set(employees.map(e => e.department).filter(Boolean))];
+  const teams = [...new Set(employees.map(e => e.team).filter(Boolean))];
+
+  const analyticsTeams = analyticsDepartment === 'all'
+    ? teams
+    : [...new Set(employees.filter(emp => emp.department === analyticsDepartment).map(emp => emp.team).filter(Boolean))];
+
+  useEffect(() => {
+    if (analyticsDepartment === 'all' || analyticsTeams.includes(analyticsTeam)) {
+      return;
+    }
+    setAnalyticsTeam('all');
+  }, [analyticsDepartment, analyticsTeam, analyticsTeams]);
+
+  const analyticsEmployees = employees.filter(emp => {
+    const matchesDepartment = analyticsDepartment === 'all' || emp.department === analyticsDepartment;
+    const matchesTeam = analyticsTeam === 'all' || emp.team === analyticsTeam;
+    return matchesDepartment && matchesTeam;
+  });
+
+  const analytics = getSkillAnalytics(analyticsEmployees);
+
   const topSkills = Object.entries(analytics.skillMap)
     .sort((a, b) => b[1].count - a[1].count)
     .slice(0, 10);
-  
-  // Filter employees
+
   const filteredEmployees = employees.filter(emp => {
     const matchesSearch = emp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      emp.skills.some(s => s.name.toLowerCase().includes(searchQuery.toLowerCase()));
+      (emp.skills || []).some(s => s.name.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesDept = selectedDepartment === 'all' || emp.department === selectedDepartment;
     const matchesTeam = selectedTeam === 'all' || emp.team === selectedTeam;
     return matchesSearch && matchesDept && matchesTeam;
   });
-  
-  const departments = [...new Set(employees.map(e => e.department))];
-  const teams = [...new Set(employees.map(e => e.team))];
-  
-  // Match employees to project
+
   const matchEmployeesToProject = (project) => {
     return employees
       .map(emp => {
-        const matchedSkills = emp.skills.filter(skill => 
+        const matchedSkills = (emp.skills || []).filter(skill =>
           project.requiredSkills.includes(skill.name)
         );
         return {
@@ -728,7 +234,7 @@
       .filter(match => match.matchPercentage > 0)
       .sort((a, b) => b.matchPercentage - a.matchPercentage);
   };
-  
+
   const saveEmployees = async (newEmployees) => {
     setEmployees(newEmployees);
     try {
@@ -741,7 +247,7 @@
       console.error('Error saving employees:', error);
     }
   };
-  
+
   const saveProjects = async (newProjects) => {
     setProjects(newProjects);
     try {
@@ -753,6 +259,43 @@
     } catch (error) {
       console.error('Error saving projects:', error);
     }
+  };
+
+  const saveInterests = async (newInterests) => {
+    setInterests(newInterests);
+    try {
+      if (window.storage) {
+        await window.storage.set('interests', JSON.stringify(newInterests));
+      }
+    } catch (error) {
+      console.error('Error saving interests:', error);
+    }
+  };
+
+  const handleExpressInterest = async (project) => {
+    const newInterest = {
+      id: Date.now(),
+      projectId: project.id,
+      projectTitle: project.title,
+      createdAt: new Date().toISOString()
+    };
+
+    await saveInterests([...interests, newInterest]);
+    setShowInterestModal(true);
+  };
+
+  const handleDeleteEmployee = async (employeeId) => {
+    const employeeToDelete = employees.find(emp => emp.id === employeeId);
+    if (!employeeToDelete) return;
+
+    const shouldDelete = window.confirm(`Delete employee ${employeeToDelete.name}?`);
+    if (!shouldDelete) return;
+
+    const updatedEmployees = employees.filter(emp => emp.id !== employeeId);
+    const updatedInterests = interests.filter(interest => interest.employeeId !== employeeId);
+
+    await saveEmployees(updatedEmployees);
+    await saveInterests(updatedInterests);
   };
 
   return (
@@ -879,7 +422,7 @@
                   }
                   
                   const newEmployee = {
-                    id: employees.length + 1,
+                    id: employees.length ? Math.max(...employees.map(emp => emp.id || 0)) + 1 : 1,
                     name: formData.get('name'),
                     department: formData.get('department'),
                     team: formData.get('team'),
@@ -1246,7 +789,7 @@
                             <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-slate-200">
                               <button
                                 onClick={() => {
-                                  alert(`Interest recorded for: ${project.title}\n\nNext Steps:\n• Project manager will review your profile\n• You'll be contacted if you're a good fit\n• Check your email for updates`);
+                                  handleExpressInterest(project);
                                 }}
                                 className="flex-1 px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md text-sm sm:text-base"
                               >
@@ -1330,173 +873,144 @@
               </button>
             </div>
 
+            <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm">
+              <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-4">View Scope</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Level</label>
+                  <select
+                    value={analyticsDepartment === 'all' ? 'enterprise' : 'team'}
+                    onChange={(e) => {
+                      if (e.target.value === 'enterprise') {
+                        setAnalyticsDepartment('all');
+                        setAnalyticsTeam('all');
+                      }
+                    }}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  >
+                    <option value="enterprise">Enterprise wide</option>
+                    <option value="team">Business Unit / Team</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Business Unit</label>
+                  <select
+                    value={analyticsDepartment}
+                    onChange={(e) => {
+                      setAnalyticsDepartment(e.target.value);
+                      setAnalyticsTeam('all');
+                    }}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  >
+                    <option value="all">All Business Units</option>
+                    {departments.map(dept => (
+                      <option key={dept} value={dept}>{dept}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Team</label>
+                  <select
+                    value={analyticsTeam}
+                    onChange={(e) => setAnalyticsTeam(e.target.value)}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  >
+                    <option value="all">All Teams</option>
+                    {analyticsTeams.map(team => (
+                      <option key={team} value={team}>{team}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
             {/* Key Metrics */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
-                    <Users className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600" />
-                  </div>
-                  <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" />
-                </div>
-                <div className="text-2xl sm:text-3xl font-bold text-slate-900">{employees.length}</div>
-                <div className="text-xs sm:text-sm text-slate-600">Total Employees</div>
+                <div className="text-2xl sm:text-3xl font-bold text-slate-900">{analyticsEmployees.length}</div>
+                <div className="text-xs sm:text-sm text-slate-600">Employees in Scope</div>
               </div>
-
               <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <Award className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
-                  </div>
-                  <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" />
-                </div>
                 <div className="text-2xl sm:text-3xl font-bold text-slate-900">{Object.keys(analytics.skillMap).length}</div>
                 <div className="text-xs sm:text-sm text-slate-600">Unique Skills</div>
               </div>
-
               <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Target className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
-                  </div>
-                  <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" />
-                </div>
-                <div className="text-2xl sm:text-3xl font-bold text-slate-900">{departments.length}</div>
-                <div className="text-xs sm:text-sm text-slate-600">Departments</div>
+                <div className="text-2xl sm:text-3xl font-bold text-slate-900">{Object.keys(analytics.departmentSkills).length}</div>
+                <div className="text-xs sm:text-sm text-slate-600">Business Units in Scope</div>
               </div>
-
               <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                    <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
-                  </div>
-                  <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full">Active</span>
-                </div>
                 <div className="text-2xl sm:text-3xl font-bold text-slate-900">{projects.length}</div>
                 <div className="text-xs sm:text-sm text-slate-600">Open Projects</div>
               </div>
             </div>
 
-            {/* Top Skills */}
-            <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm">
-              <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-4">Top 10 Skills Across Enterprise</h3>
-              <div className="space-y-3">
-                {topSkills.map(([skill, data], index) => {
-                  const maxCount = topSkills[0][1].count;
-                  const percentage = (data.count / maxCount) * 100;
-                  return (
-                    <div key={skill} className="group">
-                      <div className="flex items-center justify-between mb-1">
-                        <div className="flex items-center gap-3">
-                          <div className="w-6 h-6 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-md flex items-center justify-center text-white text-xs font-bold">
-                            {index + 1}
+            {analyticsEmployees.length === 0 ? (
+              <div className="bg-white rounded-xl p-8 sm:p-12 border border-slate-200 text-center">
+                <h3 className="text-lg sm:text-xl font-semibold text-slate-900 mb-2">No analytics data available</h3>
+                <p className="text-sm sm:text-base text-slate-600">Add employees, then use filters to view enterprise, business unit, or team insights.</p>
+              </div>
+            ) : (
+              <>
+                <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm">
+                  <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-4">Top Skills in Current Scope</h3>
+                  <div className="space-y-3">
+                    {topSkills.map(([skill, data], index) => {
+                      const maxCount = topSkills[0][1].count;
+                      const percentage = (data.count / maxCount) * 100;
+                      return (
+                        <div key={skill} className="group">
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="flex items-center gap-3">
+                              <div className="w-6 h-6 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-md flex items-center justify-center text-white text-xs font-bold">
+                                {index + 1}
+                              </div>
+                              <span className="font-medium text-slate-900">{skill}</span>
+                            </div>
+                            <span className="text-sm font-semibold text-slate-700">{data.count} employees</span>
                           </div>
-                          <span className="font-medium text-slate-900">{skill}</span>
-                          <span className="text-xs px-2 py-1 bg-slate-100 text-slate-600 rounded-full">{data.category}</span>
+                          <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full" style={{ width: `${percentage}%` }} />
+                          </div>
                         </div>
-                        <span className="text-sm font-semibold text-slate-700">{data.count} employees</span>
-                      </div>
-                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-500 group-hover:from-indigo-600 group-hover:to-purple-600"
-                          style={{ width: `${percentage}%` }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+                      );
+                    })}
+                  </div>
+                </div>
 
-            {/* Department Breakdown */}
-            <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">Skills by Department</h3>
-              <div className="space-y-4">
-                {Object.entries(analytics.departmentSkills).map(([dept, skills]) => {
-                  const isExpanded = expandedSkills[dept];
-                  const topDeptSkills = Object.entries(skills)
-                    .sort((a, b) => b[1] - a[1])
-                    .slice(0, isExpanded ? undefined : 5);
-                  
-                  return (
-                    <div key={dept} className="border border-slate-200 rounded-lg overflow-hidden">
-                      <button
-                        onClick={() => setExpandedSkills(prev => ({ ...prev, [dept]: !prev[dept] }))}
-                        className="w-full px-4 py-3 bg-slate-50 hover:bg-slate-100 transition-colors flex items-center justify-between"
-                      >
-                        <div className="flex items-center gap-3">
-                          {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                          <span className="font-semibold text-slate-900">{dept}</span>
-                          <span className="text-sm text-slate-600">
-                            {Object.keys(skills).length} skills • {employees.filter(e => e.department === dept).length} employees
-                          </span>
+                <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+                  <h3 className="text-lg font-semibold text-slate-900 mb-4">Skills by Business Unit</h3>
+                  <div className="space-y-3">
+                    {Object.entries(analytics.departmentSkills).map(([dept, skills]) => (
+                      <div key={dept} className="border border-slate-200 rounded-lg p-4">
+                        <div className="font-semibold text-slate-900 mb-2">{dept}</div>
+                        <div className="text-sm text-slate-600">{Object.keys(skills).length} skills • {analyticsEmployees.filter(e => e.department === dept).length} employees</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+                  <h3 className="text-lg font-semibold text-slate-900 mb-4">Skills by Team</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {Object.entries(analytics.teamSkills).map(([team, data]) => {
+                      const topTeamSkills = Object.entries(data.skills).sort((a, b) => b[1] - a[1]).slice(0, 5);
+                      return (
+                        <div key={team} className="border border-slate-200 rounded-lg p-4">
+                          <h4 className="font-semibold text-slate-900">{team}</h4>
+                          <p className="text-xs text-slate-600 mb-2">{data.department}</p>
+                          {topTeamSkills.map(([skill, count]) => (
+                            <div key={skill} className="flex items-center justify-between text-sm">
+                              <span className="text-slate-700">{skill}</span>
+                              <span className="text-slate-500">{count}</span>
+                            </div>
+                          ))}
                         </div>
-                      </button>
-                      <div className="p-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-                        {topDeptSkills.map(([skill, count]) => (
-                          <div key={skill} className="px-3 py-2 bg-slate-50 rounded-lg border border-slate-200">
-                            <div className="text-sm font-medium text-slate-900">{skill}</div>
-                            <div className="text-xs text-slate-600">{count} employees</div>
-                          </div>
-                        ))}
-                        {!isExpanded && Object.keys(skills).length > 5 && (
-                          <div className="px-3 py-2 bg-indigo-50 rounded-lg border border-indigo-200 text-indigo-600 text-sm font-medium flex items-center justify-center cursor-pointer">
-                            +{Object.keys(skills).length - 5} more
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Team Breakdown */}
-            <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">Skills by Team</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {Object.entries(analytics.teamSkills).map(([team, data]) => {
-                  const topTeamSkills = Object.entries(data.skills)
-                    .sort((a, b) => b[1] - a[1])
-                    .slice(0, 5);
-                  
-                  return (
-                    <div key={team} className="border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                      <div className="mb-3">
-                        <h4 className="font-semibold text-slate-900">{team}</h4>
-                        <p className="text-xs text-slate-600">{data.department}</p>
-                      </div>
-                      <div className="space-y-2">
-                        {topTeamSkills.map(([skill, count]) => (
-                          <div key={skill} className="flex items-center justify-between text-sm">
-                            <span className="text-slate-700">{skill}</span>
-                            <span className="px-2 py-1 bg-slate-100 text-slate-600 rounded text-xs font-medium">
-                              {count}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Skill Categories Distribution */}
-            <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">Skill Categories Distribution</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {Object.entries(analytics.categoryMap)
-                  .sort((a, b) => b[1] - a[1])
-                  .map(([category, count]) => (
-                    <div key={category} className="p-4 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg border border-indigo-200">
-                      <div className="text-2xl font-bold text-indigo-600 mb-1">{count}</div>
-                      <div className="text-sm font-medium text-slate-900">{category}</div>
-                      <div className="text-xs text-slate-600">skill instances</div>
-                    </div>
-                  ))}
-              </div>
-            </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         )}
 
@@ -1701,7 +1215,7 @@
                         <input name="title" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Department</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Business Unit</label>
                         <input name="department" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
                       </div>
                       <div>
@@ -1749,14 +1263,19 @@
                     <tr>
                       <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Name</th>
                       <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Role</th>
-                      <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider hidden sm:table-cell">Department</th>
+                      <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider hidden sm:table-cell">Business Unit</th>
                       <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider hidden md:table-cell">Team</th>
                       <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Skills</th>
                       <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Status</th>
+                      <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200">
-                    {employees.map(emp => (
+                    {employees.length === 0 ? (
+                      <tr>
+                        <td colSpan="7" className="px-4 sm:px-6 py-8 text-center text-sm text-slate-500">No employees yet. Add an employee to get started.</td>
+                      </tr>
+                    ) : employees.map(emp => (
                       <tr key={emp.id} className="hover:bg-slate-50 transition-colors">
                         <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap font-medium text-slate-900 text-sm">{emp.name}</td>
                         <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-slate-600">{emp.role}</td>
@@ -1786,6 +1305,14 @@
                           }`}>
                             {emp.availability}
                           </span>
+                        </td>
+                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                          <button
+                            onClick={() => handleDeleteEmployee(emp.id)}
+                            className="px-3 py-1.5 text-xs sm:text-sm bg-red-100 text-red-700 rounded-lg hover:bg-red-200"
+                          >
+                            Delete
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -1817,7 +1344,7 @@
                     });
                     
                     const newEmployee = {
-                      id: employees.length + 1,
+                      id: employees.length ? Math.max(...employees.map(emp => emp.id || 0)) + 1 : 1,
                       name: formData.get('name'),
                       department: formData.get('department'),
                       team: formData.get('team'),
@@ -1838,7 +1365,7 @@
                         <input name="role" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Department</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Business Unit</label>
                         <input name="department" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
                       </div>
                       <div>
@@ -1879,6 +1406,25 @@
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {showInterestModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowInterestModal(false)}>
+            <div className="bg-white rounded-xl p-6 max-w-lg w-full" onClick={(e) => e.stopPropagation()}>
+              <h3 className="text-lg font-semibold text-slate-900 mb-3">Interest submitted</h3>
+              <p className="text-sm text-slate-700 mb-5">
+                Thanks for your interest in this project! The responsible manager will review your profile and will be in touch if you're a good fit. Check your email for updates.
+              </p>
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setShowInterestModal(false)}
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                >
+                  OK
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
