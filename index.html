@@ -1,0 +1,1824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skills Intelligence Platform</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, sans-serif; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <script>
+    // Storage polyfill using localStorage
+    window.storage = {
+      async get(key) {
+        try {
+          const value = localStorage.getItem(key);
+          return value ? { key, value, shared: false } : null;
+        } catch {
+          return null;
+        }
+      },
+      async set(key, value) {
+        try {
+          localStorage.setItem(key, value);
+          return { key, value, shared: false };
+        } catch {
+          return null;
+        }
+      },
+      async delete(key) {
+        try {
+          localStorage.removeItem(key);
+          return { key, deleted: true, shared: false };
+        } catch {
+          return null;
+        }
+      },
+      async list(prefix) {
+        try {
+          const keys = [];
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (!prefix || key.startsWith(prefix)) {
+              keys.push(key);
+            }
+          }
+          return { keys, prefix, shared: false };
+        } catch {
+          return { keys: [], shared: false };
+        }
+      }
+    };
+
+    // Lucide icons
+    const { 
+      Users, Briefcase, BarChart3, Settings, Search, Plus, X, 
+      TrendingUp, Target, Award, Filter, Download, ChevronDown, ChevronRight 
+    } = lucide;
+  </script>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+              id: 1,
+              name: "Sarah Chen",
+              department: "Engineering",
+              team: "Backend",
+              role: "Senior Software Engineer",
+              availability: "Available",
+              skills: [
+                { name: "Python", level: "Expert", category: "Programming" },
+                { name: "AWS", level: "Advanced", category: "Cloud" },
+                { name: "PostgreSQL", level: "Advanced", category: "Database" },
+                { name: "API Design", level: "Expert", category: "Architecture" },
+                { name: "Django", level: "Advanced", category: "Framework" }
+              ]
+            },
+            {
+              id: 2,
+              name: "Marcus Johnson",
+              department: "Engineering",
+              team: "Frontend",
+              role: "Staff Engineer",
+              availability: "Partially Available",
+              skills: [
+                { name: "React", level: "Expert", category: "Programming" },
+                { name: "TypeScript", level: "Expert", category: "Programming" },
+                { name: "UI/UX Design", level: "Advanced", category: "Design" },
+                { name: "Accessibility", level: "Advanced", category: "Standards" },
+                { name: "CSS", level: "Expert", category: "Design" }
+              ]
+            },
+            {
+              id: 3,
+              name: "Priya Patel",
+              department: "Product",
+              team: "Analytics",
+              role: "Product Manager",
+              availability: "Available",
+              skills: [
+                { name: "Data Analysis", level: "Expert", category: "Analytics" },
+                { name: "SQL", level: "Advanced", category: "Database" },
+                { name: "Product Strategy", level: "Expert", category: "Strategy" },
+                { name: "A/B Testing", level: "Advanced", category: "Analytics" },
+                { name: "Roadmap Planning", level: "Expert", category: "Strategy" }
+              ]
+            },
+            {
+              id: 4,
+              name: "James Wilson",
+              department: "Engineering",
+              team: "DevOps",
+              role: "DevOps Engineer",
+              availability: "Busy",
+              skills: [
+                { name: "Kubernetes", level: "Expert", category: "Cloud" },
+                { name: "Docker", level: "Expert", category: "Cloud" },
+                { name: "CI/CD", level: "Advanced", category: "DevOps" },
+                { name: "Terraform", level: "Advanced", category: "Infrastructure" },
+                { name: "AWS", level: "Advanced", category: "Cloud" }
+              ]
+            },
+            {
+              id: 5,
+              name: "Lisa Anderson",
+              department: "Design",
+              team: "Product Design",
+              role: "Senior Designer",
+              availability: "Available",
+              skills: [
+                { name: "Figma", level: "Expert", category: "Design" },
+                { name: "User Research", level: "Advanced", category: "Research" },
+                { name: "Prototyping", level: "Expert", category: "Design" },
+                { name: "Design Systems", level: "Advanced", category: "Design" },
+                { name: "Interaction Design", level: "Expert", category: "Design" }
+              ]
+            },
+            {
+              id: 6,
+              name: "Alex Kim",
+              department: "Engineering",
+              team: "Backend",
+              role: "Software Engineer",
+              availability: "Available",
+              skills: [
+                { name: "Java", level: "Advanced", category: "Programming" },
+                { name: "Spring Boot", level: "Advanced", category: "Framework" },
+                { name: "MongoDB", level: "Intermediate", category: "Database" },
+                { name: "Microservices", level: "Advanced", category: "Architecture" },
+                { name: "Redis", level: "Intermediate", category: "Database" }
+              ]
+            },
+            {
+              id: 7,
+              name: "Emma Rodriguez",
+              department: "Product",
+              team: "Growth",
+              role: "Growth PM",
+              availability: "Partially Available",
+              skills: [
+                { name: "Growth Marketing", level: "Expert", category: "Marketing" },
+                { name: "Analytics", level: "Advanced", category: "Analytics" },
+                { name: "Experimentation", level: "Expert", category: "Analytics" },
+                { name: "SQL", level: "Intermediate", category: "Database" },
+                { name: "Google Analytics", level: "Advanced", category: "Analytics" }
+              ]
+            },
+            {
+              id: 8,
+              name: "David Lee",
+              department: "Engineering",
+              team: "Frontend",
+              role: "Senior Software Engineer",
+              availability: "Available",
+              skills: [
+                { name: "Vue.js", level: "Expert", category: "Programming" },
+                { name: "JavaScript", level: "Expert", category: "Programming" },
+                { name: "CSS", level: "Advanced", category: "Design" },
+                { name: "Performance Optimization", level: "Advanced", category: "Engineering" },
+                { name: "Webpack", level: "Advanced", category: "DevOps" }
+              ]
+            },
+            {
+              id: 9,
+              name: "Michael Torres",
+              department: "Marketing",
+              team: "Content",
+              role: "Content Marketing Manager",
+              availability: "Available",
+              skills: [
+                { name: "Content Strategy", level: "Expert", category: "Marketing" },
+                { name: "SEO", level: "Advanced", category: "Marketing" },
+                { name: "Copywriting", level: "Expert", category: "Marketing" },
+                { name: "Social Media", level: "Advanced", category: "Marketing" }
+              ]
+            },
+            {
+              id: 10,
+              name: "Rachel Green",
+              department: "Sales",
+              team: "Enterprise",
+              role: "Senior Account Executive",
+              availability: "Busy",
+              skills: [
+                { name: "Enterprise Sales", level: "Expert", category: "Sales" },
+                { name: "Negotiation", level: "Expert", category: "Sales" },
+                { name: "Salesforce", level: "Advanced", category: "Tools" },
+                { name: "Account Management", level: "Advanced", category: "Sales" }
+              ]
+            },
+            {
+              id: 11,
+              name: "Kevin Nguyen",
+              department: "Engineering",
+              team: "Mobile",
+              role: "iOS Engineer",
+              availability: "Available",
+              skills: [
+                { name: "Swift", level: "Expert", category: "Programming" },
+                { name: "iOS Development", level: "Expert", category: "Programming" },
+                { name: "UIKit", level: "Advanced", category: "Framework" },
+                { name: "SwiftUI", level: "Advanced", category: "Framework" }
+              ]
+            },
+            {
+              id: 12,
+              name: "Amanda Foster",
+              department: "Design",
+              team: "Brand",
+              role: "Brand Designer",
+              availability: "Available",
+              skills: [
+                { name: "Branding", level: "Expert", category: "Design" },
+                { name: "Illustration", level: "Advanced", category: "Design" },
+                { name: "Adobe Creative Suite", level: "Expert", category: "Tools" },
+                { name: "Motion Design", level: "Intermediate", category: "Design" }
+              ]
+            },
+            {
+              id: 13,
+              name: "Chris Martinez",
+              department: "Data",
+              team: "Analytics",
+              role: "Data Scientist",
+              availability: "Partially Available",
+              skills: [
+                { name: "Machine Learning", level: "Expert", category: "Analytics" },
+                { name: "Python", level: "Expert", category: "Programming" },
+                { name: "Statistics", level: "Expert", category: "Analytics" },
+                { name: "TensorFlow", level: "Advanced", category: "Framework" },
+                { name: "SQL", level: "Advanced", category: "Database" }
+              ]
+            },
+            {
+              id: 14,
+              name: "Jessica Wu",
+              department: "Product",
+              team: "Platform",
+              role: "Senior Product Manager",
+              availability: "Available",
+              skills: [
+                { name: "Product Strategy", level: "Expert", category: "Strategy" },
+                { name: "API Products", level: "Advanced", category: "Strategy" },
+                { name: "Technical Writing", level: "Advanced", category: "Documentation" },
+                { name: "Roadmap Planning", level: "Expert", category: "Strategy" }
+              ]
+            },
+            {
+              id: 15,
+              name: "Robert Jackson",
+              department: "Engineering",
+              team: "Security",
+              role: "Security Engineer",
+              availability: "Busy",
+              skills: [
+                { name: "Security Auditing", level: "Expert", category: "Security" },
+                { name: "Penetration Testing", level: "Advanced", category: "Security" },
+                { name: "Python", level: "Advanced", category: "Programming" },
+                { name: "Cryptography", level: "Advanced", category: "Security" }
+              ]
+            },
+            {
+              id: 16,
+              name: "Nina Patel",
+              department: "Data",
+              team: "Engineering",
+              role: "Data Engineer",
+              availability: "Available",
+              skills: [
+                { name: "Apache Spark", level: "Expert", category: "Framework" },
+                { name: "Python", level: "Advanced", category: "Programming" },
+                { name: "SQL", level: "Expert", category: "Database" },
+                { name: "Data Pipelines", level: "Expert", category: "Architecture" },
+                { name: "AWS", level: "Advanced", category: "Cloud" }
+              ]
+            },
+            {
+              id: 17,
+              name: "Tom Bradley",
+              department: "Engineering",
+              team: "Mobile",
+              role: "Android Engineer",
+              availability: "Available",
+              skills: [
+                { name: "Kotlin", level: "Expert", category: "Programming" },
+                { name: "Android Development", level: "Expert", category: "Programming" },
+                { name: "Jetpack Compose", level: "Advanced", category: "Framework" },
+                { name: "Java", level: "Advanced", category: "Programming" }
+              ]
+            },
+            {
+              id: 18,
+              name: "Sophie Chen",
+              department: "Marketing",
+              team: "Performance",
+              role: "Performance Marketing Manager",
+              availability: "Partially Available",
+              skills: [
+                { name: "Paid Advertising", level: "Expert", category: "Marketing" },
+                { name: "Google Ads", level: "Expert", category: "Marketing" },
+                { name: "Facebook Ads", level: "Advanced", category: "Marketing" },
+                { name: "Analytics", level: "Advanced", category: "Analytics" }
+              ]
+            },
+            {
+              id: 19,
+              name: "Daniel Kim",
+              department: "Engineering",
+              team: "Infrastructure",
+              role: "Site Reliability Engineer",
+              availability: "Available",
+              skills: [
+                { name: "Kubernetes", level: "Expert", category: "Cloud" },
+                { name: "Monitoring", level: "Expert", category: "DevOps" },
+                { name: "Python", level: "Advanced", category: "Programming" },
+                { name: "Incident Management", level: "Expert", category: "DevOps" }
+              ]
+            },
+            {
+              id: 20,
+              name: "Maria Garcia",
+              department: "Design",
+              team: "UX Research",
+              role: "UX Researcher",
+              availability: "Available",
+              skills: [
+                { name: "User Research", level: "Expert", category: "Research" },
+                { name: "Usability Testing", level: "Expert", category: "Research" },
+                { name: "User Interviews", level: "Expert", category: "Research" },
+                { name: "Data Analysis", level: "Advanced", category: "Analytics" }
+              ]
+            },
+            {
+              id: 21,
+              name: "Brian Thompson",
+              department: "Sales",
+              team: "SMB",
+              role: "Account Executive",
+              availability: "Available",
+              skills: [
+                { name: "SMB Sales", level: "Advanced", category: "Sales" },
+                { name: "Customer Success", level: "Advanced", category: "Sales" },
+                { name: "Salesforce", level: "Intermediate", category: "Tools" },
+                { name: "Prospecting", level: "Advanced", category: "Sales" }
+              ]
+            },
+            {
+              id: 22,
+              name: "Laura Mitchell",
+              department: "Product",
+              team: "Core",
+              role: "Product Manager",
+              availability: "Partially Available",
+              skills: [
+                { name: "Product Management", level: "Advanced", category: "Strategy" },
+                { name: "Agile", level: "Advanced", category: "Management" },
+                { name: "User Stories", level: "Advanced", category: "Documentation" },
+                { name: "Stakeholder Management", level: "Advanced", category: "Management" }
+              ]
+            },
+            {
+              id: 23,
+              name: "Jason Park",
+              department: "Engineering",
+              team: "Backend",
+              role: "Software Engineer",
+              availability: "Available",
+              skills: [
+                { name: "Node.js", level: "Advanced", category: "Programming" },
+                { name: "JavaScript", level: "Advanced", category: "Programming" },
+                { name: "GraphQL", level: "Advanced", category: "Architecture" },
+                { name: "MongoDB", level: "Advanced", category: "Database" }
+              ]
+            },
+            {
+              id: 24,
+              name: "Emily Davis",
+              department: "Data",
+              team: "BI",
+              role: "Business Intelligence Analyst",
+              availability: "Available",
+              skills: [
+                { name: "Tableau", level: "Expert", category: "Analytics" },
+                { name: "SQL", level: "Advanced", category: "Database" },
+                { name: "Data Visualization", level: "Expert", category: "Analytics" },
+                { name: "Business Analysis", level: "Advanced", category: "Analytics" }
+              ]
+            },
+            {
+              id: 25,
+              name: "Andrew Wilson",
+              department: "Engineering",
+              team: "Frontend",
+              role: "Frontend Engineer",
+              availability: "Busy",
+              skills: [
+                { name: "React", level: "Advanced", category: "Programming" },
+                { name: "JavaScript", level: "Advanced", category: "Programming" },
+                { name: "HTML", level: "Expert", category: "Programming" },
+                { name: "CSS", level: "Advanced", category: "Design" }
+              ]
+            },
+            {
+              id: 26,
+              name: "Olivia Brown",
+              department: "Marketing",
+              team: "Brand",
+              role: "Marketing Manager",
+              availability: "Available",
+              skills: [
+                { name: "Brand Strategy", level: "Expert", category: "Marketing" },
+                { name: "Campaign Management", level: "Advanced", category: "Marketing" },
+                { name: "Content Marketing", level: "Advanced", category: "Marketing" },
+                { name: "Project Management", level: "Advanced", category: "Management" }
+              ]
+            },
+            {
+              id: 27,
+              name: "Ryan Lee",
+              department: "Engineering",
+              team: "QA",
+              role: "QA Engineer",
+              availability: "Available",
+              skills: [
+                { name: "Test Automation", level: "Expert", category: "Engineering" },
+                { name: "Selenium", level: "Advanced", category: "Tools" },
+                { name: "Python", level: "Advanced", category: "Programming" },
+                { name: "Manual Testing", level: "Expert", category: "Engineering" }
+              ]
+            },
+            {
+              id: 28,
+              name: "Hannah Clark",
+              department: "Design",
+              team: "Product Design",
+              role: "Product Designer",
+              availability: "Partially Available",
+              skills: [
+                { name: "UI Design", level: "Advanced", category: "Design" },
+                { name: "Figma", level: "Advanced", category: "Design" },
+                { name: "Prototyping", level: "Advanced", category: "Design" },
+                { name: "Visual Design", level: "Advanced", category: "Design" }
+              ]
+            },
+            {
+              id: 29,
+              name: "Steven Harris",
+              department: "Data",
+              team: "Analytics",
+              role: "Analytics Engineer",
+              availability: "Available",
+              skills: [
+                { name: "SQL", level: "Expert", category: "Database" },
+                { name: "dbt", level: "Expert", category: "Tools" },
+                { name: "Python", level: "Advanced", category: "Programming" },
+                { name: "Data Modeling", level: "Expert", category: "Architecture" }
+              ]
+            },
+            {
+              id: 30,
+              name: "Victoria Adams",
+              department: "Sales",
+              team: "Operations",
+              role: "Sales Operations Manager",
+              availability: "Available",
+              skills: [
+                { name: "Salesforce Administration", level: "Expert", category: "Tools" },
+                { name: "Sales Analytics", level: "Advanced", category: "Analytics" },
+                { name: "Process Optimization", level: "Advanced", category: "Management" },
+                { name: "Data Analysis", level: "Advanced", category: "Analytics" }
+              ]
+            }
+          ];
+          setEmployees(demoEmployees);
+          if (window.storage) {
+            await window.storage.set('employees', JSON.stringify(demoEmployees));
+          }
+        } catch (error) {
+          console.error('Error setting demo employees:', error);
+        }
+      };
+      
+      const loadDemoProjects = async () => {
+        try {
+          const demoProjects = [
+            {
+              id: 1,
+              title: "API Gateway Redesign",
+              department: "Engineering",
+              duration: "6 weeks",
+              requiredSkills: ["Python", "API Design", "AWS"],
+              status: "Open"
+            },
+            {
+              id: 2,
+              title: "Design System V2",
+              department: "Design",
+              duration: "8 weeks",
+              requiredSkills: ["Figma", "Design Systems", "React"],
+              status: "Open"
+            },
+            {
+              id: 3,
+              title: "Mobile App Performance Optimization",
+              department: "Engineering",
+              duration: "4 weeks",
+              requiredSkills: ["iOS Development", "Android Development", "Performance Optimization"],
+              status: "Open"
+            },
+            {
+              id: 4,
+              title: "Customer Analytics Dashboard",
+              department: "Data",
+              duration: "5 weeks",
+              requiredSkills: ["SQL", "Data Visualization", "Tableau"],
+              status: "Open"
+            },
+            {
+              id: 5,
+              title: "Security Audit & Remediation",
+              department: "Engineering",
+              duration: "3 weeks",
+              requiredSkills: ["Security Auditing", "Penetration Testing", "Python"],
+              status: "Open"
+            },
+            {
+              id: 6,
+              title: "Brand Refresh Campaign",
+              department: "Marketing",
+              duration: "10 weeks",
+              requiredSkills: ["Brand Strategy", "Branding", "Content Marketing"],
+              status: "Open"
+            }
+          ];
+          setProjects(demoProjects);
+          if (window.storage) {
+            await window.storage.set('projects', JSON.stringify(demoProjects));
+          }
+        } catch (error) {
+          console.error('Error setting demo projects:', error);
+        }
+      };
+      
+      loadData();
+    };
+    
+    loadData();
+  }, []);
+  
+  // Analytics calculations
+  const getSkillAnalytics = () => {
+    const allSkills = employees.flatMap(emp => emp.skills);
+    const skillMap = {};
+    const categoryMap = {};
+    const departmentSkills = {};
+    const teamSkills = {};
+    
+    allSkills.forEach(skill => {
+      // Overall skills
+      if (!skillMap[skill.name]) {
+        skillMap[skill.name] = { count: 0, levels: [], category: skill.category };
+      }
+      skillMap[skill.name].count++;
+      skillMap[skill.name].levels.push(skill.level);
+      
+      // Categories
+      if (!categoryMap[skill.category]) {
+        categoryMap[skill.category] = 0;
+      }
+      categoryMap[skill.category]++;
+    });
+    
+    // Department and team breakdown
+    employees.forEach(emp => {
+      if (!departmentSkills[emp.department]) {
+        departmentSkills[emp.department] = {};
+      }
+      if (!teamSkills[emp.team]) {
+        teamSkills[emp.team] = { department: emp.department, skills: {} };
+      }
+      
+      emp.skills.forEach(skill => {
+        if (!departmentSkills[emp.department][skill.name]) {
+          departmentSkills[emp.department][skill.name] = 0;
+        }
+        departmentSkills[emp.department][skill.name]++;
+        
+        if (!teamSkills[emp.team].skills[skill.name]) {
+          teamSkills[emp.team].skills[skill.name] = 0;
+        }
+        teamSkills[emp.team].skills[skill.name]++;
+      });
+    });
+    
+    return { skillMap, categoryMap, departmentSkills, teamSkills };
+  };
+  
+  const analytics = getSkillAnalytics();
+  
+  // Get top skills
+  const topSkills = Object.entries(analytics.skillMap)
+    .sort((a, b) => b[1].count - a[1].count)
+    .slice(0, 10);
+  
+  // Filter employees
+  const filteredEmployees = employees.filter(emp => {
+    const matchesSearch = emp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      emp.skills.some(s => s.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesDept = selectedDepartment === 'all' || emp.department === selectedDepartment;
+    const matchesTeam = selectedTeam === 'all' || emp.team === selectedTeam;
+    return matchesSearch && matchesDept && matchesTeam;
+  });
+  
+  const departments = [...new Set(employees.map(e => e.department))];
+  const teams = [...new Set(employees.map(e => e.team))];
+  
+  // Match employees to project
+  const matchEmployeesToProject = (project) => {
+    return employees
+      .map(emp => {
+        const matchedSkills = emp.skills.filter(skill => 
+          project.requiredSkills.includes(skill.name)
+        );
+        return {
+          employee: emp,
+          matchedSkills,
+          matchPercentage: (matchedSkills.length / project.requiredSkills.length) * 100
+        };
+      })
+      .filter(match => match.matchPercentage > 0)
+      .sort((a, b) => b.matchPercentage - a.matchPercentage);
+  };
+  
+  const saveEmployees = async (newEmployees) => {
+    setEmployees(newEmployees);
+    try {
+      if (window.storage) {
+        await window.storage.set('employees', JSON.stringify(newEmployees));
+      } else {
+        console.warn('Storage not available - changes will not persist');
+      }
+    } catch (error) {
+      console.error('Error saving employees:', error);
+    }
+  };
+  
+  const saveProjects = async (newProjects) => {
+    setProjects(newProjects);
+    try {
+      if (window.storage) {
+        await window.storage.set('projects', JSON.stringify(newProjects));
+      } else {
+        console.warn('Storage not available - changes will not persist');
+      }
+    } catch (error) {
+      console.error('Error saving projects:', error);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      {/* Header */}
+      <header className="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
+                <Award className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+              <div className="min-w-0">
+                <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent truncate" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+                  Skills Intelligence Platform
+                </h1>
+                <p className="text-xs sm:text-sm text-slate-500 hidden sm:block">Enterprise Talent Analytics</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-slate-600 flex-shrink-0">
+              <Users className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">{employees.length} employees • {Object.keys(analytics.skillMap).length} unique skills</span>
+              <span className="sm:hidden">{employees.length}/{Object.keys(analytics.skillMap).length}</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Navigation */}
+      <nav className="bg-white border-b border-slate-200 overflow-x-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex gap-1 min-w-max">
+            {[
+              { id: 'self-service', label: 'Employee Portal', icon: Users },
+              { id: 'opportunities', label: 'Browse Projects', icon: Target },
+              { id: 'analytics', label: 'Analytics Dashboard', icon: BarChart3 },
+              { id: 'directory', label: 'Skills Directory', icon: Users },
+              { id: 'projects', label: 'Project Management', icon: Briefcase },
+              { id: 'admin', label: 'Admin', icon: Settings }
+            ].map(tab => (
+              <button
+                key={tab.id}
+                onClick={(e) => {
+                  e.preventDefault();
+                  console.log('Tab clicked:', tab.id);
+                  setActiveTab(tab.id);
+                }}
+                style={{ pointerEvents: 'auto', cursor: 'pointer' }}
+                className={`flex items-center gap-2 px-4 sm:px-6 py-3 border-b-2 transition-all whitespace-nowrap text-sm sm:text-base ${
+                  activeTab === tab.id
+                    ? 'border-indigo-600 text-indigo-600 bg-indigo-50'
+                    : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                }`}
+              >
+                <tab.icon className="w-4 h-4 flex-shrink-0" />
+                <span className="font-medium">{tab.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </nav>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        {/* Employee Self-Service Portal */}
+        {activeTab === 'self-service' && (
+          <div className="max-w-3xl mx-auto space-y-6">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-slate-900 mb-2">Employee Skills Portal</h2>
+              <p className="text-slate-600">Submit your skills profile to help us match you with exciting short-term projects</p>
+            </div>
+
+            {submissionSuccess ? (
+              <div className="bg-white rounded-xl p-8 border border-slate-200 shadow-sm text-center">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-2">Profile Submitted!</h3>
+                <p className="text-slate-600 mb-6">Thank you for submitting your skills profile. You can now browse available projects and express interest!</p>
+                <div className="flex gap-3 justify-center mb-4">
+                  <button
+                    onClick={() => setActiveTab('opportunities')}
+                    className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 font-semibold shadow-md"
+                  >
+                    Browse Projects
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSubmissionSuccess(false);
+                      setSkillInputs([{ name: '', level: 'Intermediate', category: 'General' }]);
+                      setIsSubmitting(false);
+                    }}
+                    className="px-6 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50"
+                  >
+                    Submit Another Profile
+                  </button>
+                </div>
+                <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm text-left">
+                  <p className="text-blue-900 mb-2">
+                    <strong>🎯 Next Steps:</strong>
+                  </p>
+                  <ul className="text-blue-800 space-y-1 ml-4">
+                    <li>• Browse projects by clicking "Browse Projects" above</li>
+                    <li>• Filter projects by skills you want to use</li>
+                    <li>• Express interest in projects that excite you</li>
+                    <li>• Project managers will review your profile and reach out</li>
+                  </ul>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={async (e) => {
+                e.preventDefault();
+                setIsSubmitting(true);
+                try {
+                  const formData = new FormData(e.target);
+                  
+                  const validSkills = skillInputs.filter(s => s.name.trim());
+                  
+                  if (validSkills.length === 0) {
+                    alert('Please add at least one skill');
+                    setIsSubmitting(false);
+                    return;
+                  }
+                  
+                  const newEmployee = {
+                    id: employees.length + 1,
+                    name: formData.get('name'),
+                    department: formData.get('department'),
+                    team: formData.get('team'),
+                    role: formData.get('role'),
+                    availability: formData.get('availability'),
+                    skills: validSkills
+                  };
+                  
+                  await saveEmployees([...employees, newEmployee]);
+                  setSubmissionSuccess(true);
+                  setIsSubmitting(false);
+                } catch (error) {
+                  console.error('Error submitting profile:', error);
+                  alert('There was an error submitting your profile. Please try again.');
+                  setIsSubmitting(false);
+                }
+              }} className="bg-white rounded-xl p-8 border border-slate-200 shadow-sm space-y-6">
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Full Name *</label>
+                    <input 
+                      name="name" 
+                      required 
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      placeholder="John Smith"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Job Title *</label>
+                    <input 
+                      name="role" 
+                      required 
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      placeholder="Senior Software Engineer"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Department *</label>
+                    <input 
+                      name="department" 
+                      required 
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      placeholder="Engineering"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Team *</label>
+                    <input 
+                      name="team" 
+                      required 
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      placeholder="Backend"
+                    />
+                  </div>
+                  
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Availability for Short-term Projects *</label>
+                    <select 
+                      name="availability" 
+                      required 
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                      <option value="Available">Available - Ready for new projects</option>
+                      <option value="Partially Available">Partially Available - Can take on limited work</option>
+                      <option value="Busy">Busy - Not available currently</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="border-t border-slate-200 pt-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="text-lg font-semibold text-slate-900">Your Skills</h3>
+                      <p className="text-sm text-slate-600">Add all skills you'd like to use in short-term projects</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setSkillInputs([...skillInputs, { name: '', level: 'Intermediate', category: 'General' }])}
+                      className="flex items-center gap-2 px-3 py-2 text-sm bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add Skill
+                    </button>
+                  </div>
+
+                  <div className="space-y-3">
+                    {skillInputs.map((skill, index) => (
+                      <div key={index} className="flex gap-3 items-start">
+                        <div className="flex-1">
+                          <input
+                            type="text"
+                            value={skill.name}
+                            onChange={(e) => {
+                              const newSkills = [...skillInputs];
+                              newSkills[index].name = e.target.value;
+                              setSkillInputs(newSkills);
+                            }}
+                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            placeholder="e.g., Python, Project Management, Data Analysis"
+                            required={index === 0}
+                          />
+                        </div>
+                        <div className="w-40">
+                          <select
+                            value={skill.level}
+                            onChange={(e) => {
+                              const newSkills = [...skillInputs];
+                              newSkills[index].level = e.target.value;
+                              setSkillInputs(newSkills);
+                            }}
+                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          >
+                            <option value="Beginner">Beginner</option>
+                            <option value="Intermediate">Intermediate</option>
+                            <option value="Advanced">Advanced</option>
+                            <option value="Expert">Expert</option>
+                          </select>
+                        </div>
+                        <div className="w-40">
+                          <select
+                            value={skill.category}
+                            onChange={(e) => {
+                              const newSkills = [...skillInputs];
+                              newSkills[index].category = e.target.value;
+                              setSkillInputs(newSkills);
+                            }}
+                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          >
+                            <option value="General">General</option>
+                            <option value="Programming">Programming</option>
+                            <option value="Design">Design</option>
+                            <option value="Analytics">Analytics</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Cloud">Cloud</option>
+                            <option value="Database">Database</option>
+                            <option value="DevOps">DevOps</option>
+                            <option value="Architecture">Architecture</option>
+                            <option value="Strategy">Strategy</option>
+                            <option value="Research">Research</option>
+                            <option value="Management">Management</option>
+                          </select>
+                        </div>
+                        {skillInputs.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSkillInputs(skillInputs.filter((_, i) => i !== index));
+                            }}
+                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          >
+                            <X className="w-5 h-5" />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-sm text-blue-900">
+                      <strong>Tip:</strong> Be thorough with your skills! The more skills you add, the better we can match you with relevant projects.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="border-t border-slate-200 pt-6">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    onClick={(e) => {
+                      console.log('Submit button clicked', { isSubmitting });
+                    }}
+                    style={{ pointerEvents: isSubmitting ? 'none' : 'auto', cursor: isSubmitting ? 'not-allowed' : 'pointer' }}
+                    className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? 'Submitting...' : 'Submit My Skills Profile'}
+                  </button>
+                  <p className="text-xs text-slate-500 text-center mt-3">
+                    Your information will be used to match you with short-term projects that align with your skills
+                  </p>
+                </div>
+              </form>
+            )}
+
+            <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-6 border border-indigo-200">
+              <h3 className="font-semibold text-slate-900 mb-3">📋 Shareable Link</h3>
+              <p className="text-sm text-slate-700 mb-3">
+                Share this URL with employees so they can submit their own profiles:
+              </p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={window.location.href}
+                  readOnly
+                  className="flex-1 px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm"
+                />
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(window.location.href);
+                    alert('Link copied to clipboard!');
+                  }}
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm font-medium"
+                >
+                  Copy Link
+                </button>
+              </div>
+              <p className="text-xs text-slate-600 mt-2">
+                💡 Make sure to share this link on the "Employee Portal" tab so employees see the form directly
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* My Opportunities */}
+        {activeTab === 'opportunities' && (
+          <div className="space-y-4 sm:space-y-6">
+            <div className="text-center mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Project Opportunities</h2>
+              <p className="text-sm sm:text-base text-slate-600">Browse and filter projects by the skills you want to use</p>
+            </div>
+
+            {/* Search and Filter */}
+            <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm space-y-4">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                <div className="flex-1">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                    <input
+                      type="text"
+                      placeholder="Search projects or skills..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base"
+                    />
+                  </div>
+                </div>
+                <select
+                  value={selectedDepartment}
+                  onChange={(e) => setSelectedDepartment(e.target.value)}
+                  className="px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base"
+                >
+                  <option value="all">All Departments</option>
+                  {departments.map(dept => (
+                    <option key={dept} value={dept}>{dept}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Popular Skills Filter */}
+              <div>
+                <div className="text-xs sm:text-sm font-semibold text-slate-700 mb-3">Filter by Skills:</div>
+                <div className="flex flex-wrap gap-2">
+                  {(() => {
+                    const allRequiredSkills = [...new Set(projects.flatMap(p => p.requiredSkills))].sort();
+                    return allRequiredSkills.map(skill => {
+                      const isActive = searchQuery.toLowerCase() === skill.toLowerCase();
+                      return (
+                        <button
+                          key={skill}
+                          onClick={() => setSearchQuery(isActive ? '' : skill)}
+                          className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
+                            isActive
+                              ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
+                              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                          }`}
+                        >
+                          {skill}
+                        </button>
+                      );
+                    });
+                  })()}
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery('')}
+                      className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium bg-red-100 text-red-700 hover:bg-red-200 transition-all"
+                    >
+                      Clear Filter
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Project Listings */}
+            {(() => {
+              const filteredProjects = projects.filter(project => {
+                const matchesSearch = searchQuery === '' || 
+                  project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  project.requiredSkills.some(skill => skill.toLowerCase().includes(searchQuery.toLowerCase()));
+                const matchesDept = selectedDepartment === 'all' || project.department === selectedDepartment;
+                return matchesSearch && matchesDept;
+              });
+
+              return (
+                <>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg sm:text-xl font-bold text-slate-900">
+                      {filteredProjects.length} Project{filteredProjects.length !== 1 ? 's' : ''} Available
+                    </h3>
+                  </div>
+
+                  {filteredProjects.length > 0 ? (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                      {filteredProjects.map(project => {
+                        // Calculate how many employees match this project
+                        const matchingEmployees = employees.filter(emp =>
+                          emp.skills.some(skill => project.requiredSkills.includes(skill.name))
+                        ).length;
+
+                        return (
+                          <div key={project.id} className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-lg transition-all group">
+                            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+                              <div className="flex-1 min-w-0">
+                                <h4 className="text-lg sm:text-xl font-semibold text-slate-900 mb-2 group-hover:text-indigo-600 transition-colors">
+                                  {project.title}
+                                </h4>
+                                <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-slate-600">
+                                  <span className="px-2 py-1 bg-slate-100 rounded">{project.department}</span>
+                                  <span className="hidden sm:inline">•</span>
+                                  <span>{project.duration}</span>
+                                </div>
+                              </div>
+                              <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap self-start">
+                                {project.status}
+                              </span>
+                            </div>
+
+                            <div className="mb-4">
+                              <div className="text-xs sm:text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                                <Award className="w-4 h-4" />
+                                Required Skills ({project.requiredSkills.length})
+                              </div>
+                              <div className="flex flex-wrap gap-2">
+                                {project.requiredSkills.map((skill, i) => {
+                                  const isHighlighted = searchQuery && skill.toLowerCase().includes(searchQuery.toLowerCase());
+                                  return (
+                                    <span 
+                                      key={i} 
+                                      className={`px-2.5 py-1 sm:px-3 sm:py-1 rounded-full text-xs sm:text-sm font-medium transition-all ${
+                                        isHighlighted 
+                                          ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
+                                          : 'bg-indigo-100 text-indigo-700'
+                                      }`}
+                                    >
+                                      {skill}
+                                    </span>
+                                  );
+                                })}
+                              </div>
+                            </div>
+
+                            <div className="mb-4 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                              <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-600">
+                                <Users className="w-4 h-4 flex-shrink-0" />
+                                <span>
+                                  <strong className="text-slate-900">{matchingEmployees}</strong> employees have matching skills
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-slate-200">
+                              <button
+                                onClick={() => {
+                                  alert(`Interest recorded for: ${project.title}\n\nNext Steps:\n• Project manager will review your profile\n• You'll be contacted if you're a good fit\n• Check your email for updates`);
+                                }}
+                                className="flex-1 px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md text-sm sm:text-base"
+                              >
+                                Express Interest
+                              </button>
+                              <button
+                                onClick={() => {
+                                  alert(`Contact Project Manager:\n\nProject: ${project.title}\nDepartment: ${project.department}\n\nEmail: pm-${project.department.toLowerCase()}@company.com\nSlack: @project-manager-${project.id}`);
+                                }}
+                                className="px-4 py-3 border border-slate-300 text-slate-700 font-medium rounded-lg hover:bg-slate-50 transition-colors text-sm sm:text-base"
+                              >
+                                Learn More
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="bg-white rounded-xl p-8 sm:p-12 border border-slate-200 text-center">
+                      <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Search className="w-8 h-8 text-slate-400" />
+                      </div>
+                      <h3 className="text-lg sm:text-xl font-semibold text-slate-900 mb-2">No Projects Found</h3>
+                      <p className="text-sm sm:text-base text-slate-600 mb-4">
+                        No projects match your current search criteria.
+                      </p>
+                      <button
+                        onClick={() => {
+                          setSearchQuery('');
+                          setSelectedDepartment('all');
+                        }}
+                        className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm sm:text-base"
+                      >
+                        Clear All Filters
+                      </button>
+                    </div>
+                  )}
+                </>
+              );
+            })()}
+
+            {/* Tips for Employees */}
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-6 border border-blue-200">
+              <h3 className="text-sm sm:text-base font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                <svg className="w-5 h-5 text-blue-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+                How to Find the Right Project
+              </h3>
+              <ul className="text-xs sm:text-sm text-slate-700 space-y-2">
+                <li className="flex items-start gap-2">
+                  <span className="text-indigo-600 font-bold flex-shrink-0">•</span>
+                  <span><strong>Search by skill:</strong> Click any skill tag above or type in the search box to filter projects</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-indigo-600 font-bold flex-shrink-0">•</span>
+                  <span><strong>Browse by department:</strong> Use the department filter to see projects in specific teams</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-indigo-600 font-bold flex-shrink-0">•</span>
+                  <span><strong>Express interest:</strong> Click "Express Interest" on projects that excite you - you don't need to have all the required skills</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-indigo-600 font-bold flex-shrink-0">•</span>
+                  <span><strong>Learn more:</strong> Contact the project manager to understand more about the project scope and expectations</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        )}
+
+        {/* Analytics Dashboard */}
+        {activeTab === 'analytics' && (
+          <div className="space-y-4 sm:space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">Analytics Dashboard</h2>
+              <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors text-sm">
+                <Download className="w-4 h-4" />
+                Export Report
+              </button>
+            </div>
+
+            {/* Key Metrics */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                    <Users className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600" />
+                  </div>
+                  <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" />
+                </div>
+                <div className="text-2xl sm:text-3xl font-bold text-slate-900">{employees.length}</div>
+                <div className="text-xs sm:text-sm text-slate-600">Total Employees</div>
+              </div>
+
+              <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <Award className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
+                  </div>
+                  <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" />
+                </div>
+                <div className="text-2xl sm:text-3xl font-bold text-slate-900">{Object.keys(analytics.skillMap).length}</div>
+                <div className="text-xs sm:text-sm text-slate-600">Unique Skills</div>
+              </div>
+
+              <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <Target className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                  </div>
+                  <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" />
+                </div>
+                <div className="text-2xl sm:text-3xl font-bold text-slate-900">{departments.length}</div>
+                <div className="text-xs sm:text-sm text-slate-600">Departments</div>
+              </div>
+
+              <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                    <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
+                  </div>
+                  <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full">Active</span>
+                </div>
+                <div className="text-2xl sm:text-3xl font-bold text-slate-900">{projects.length}</div>
+                <div className="text-xs sm:text-sm text-slate-600">Open Projects</div>
+              </div>
+            </div>
+
+            {/* Top Skills */}
+            <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm">
+              <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-4">Top 10 Skills Across Enterprise</h3>
+              <div className="space-y-3">
+                {topSkills.map(([skill, data], index) => {
+                  const maxCount = topSkills[0][1].count;
+                  const percentage = (data.count / maxCount) * 100;
+                  return (
+                    <div key={skill} className="group">
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-3">
+                          <div className="w-6 h-6 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-md flex items-center justify-center text-white text-xs font-bold">
+                            {index + 1}
+                          </div>
+                          <span className="font-medium text-slate-900">{skill}</span>
+                          <span className="text-xs px-2 py-1 bg-slate-100 text-slate-600 rounded-full">{data.category}</span>
+                        </div>
+                        <span className="text-sm font-semibold text-slate-700">{data.count} employees</span>
+                      </div>
+                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-500 group-hover:from-indigo-600 group-hover:to-purple-600"
+                          style={{ width: `${percentage}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Department Breakdown */}
+            <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Skills by Department</h3>
+              <div className="space-y-4">
+                {Object.entries(analytics.departmentSkills).map(([dept, skills]) => {
+                  const isExpanded = expandedSkills[dept];
+                  const topDeptSkills = Object.entries(skills)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, isExpanded ? undefined : 5);
+                  
+                  return (
+                    <div key={dept} className="border border-slate-200 rounded-lg overflow-hidden">
+                      <button
+                        onClick={() => setExpandedSkills(prev => ({ ...prev, [dept]: !prev[dept] }))}
+                        className="w-full px-4 py-3 bg-slate-50 hover:bg-slate-100 transition-colors flex items-center justify-between"
+                      >
+                        <div className="flex items-center gap-3">
+                          {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                          <span className="font-semibold text-slate-900">{dept}</span>
+                          <span className="text-sm text-slate-600">
+                            {Object.keys(skills).length} skills • {employees.filter(e => e.department === dept).length} employees
+                          </span>
+                        </div>
+                      </button>
+                      <div className="p-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                        {topDeptSkills.map(([skill, count]) => (
+                          <div key={skill} className="px-3 py-2 bg-slate-50 rounded-lg border border-slate-200">
+                            <div className="text-sm font-medium text-slate-900">{skill}</div>
+                            <div className="text-xs text-slate-600">{count} employees</div>
+                          </div>
+                        ))}
+                        {!isExpanded && Object.keys(skills).length > 5 && (
+                          <div className="px-3 py-2 bg-indigo-50 rounded-lg border border-indigo-200 text-indigo-600 text-sm font-medium flex items-center justify-center cursor-pointer">
+                            +{Object.keys(skills).length - 5} more
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Team Breakdown */}
+            <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Skills by Team</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {Object.entries(analytics.teamSkills).map(([team, data]) => {
+                  const topTeamSkills = Object.entries(data.skills)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 5);
+                  
+                  return (
+                    <div key={team} className="border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                      <div className="mb-3">
+                        <h4 className="font-semibold text-slate-900">{team}</h4>
+                        <p className="text-xs text-slate-600">{data.department}</p>
+                      </div>
+                      <div className="space-y-2">
+                        {topTeamSkills.map(([skill, count]) => (
+                          <div key={skill} className="flex items-center justify-between text-sm">
+                            <span className="text-slate-700">{skill}</span>
+                            <span className="px-2 py-1 bg-slate-100 text-slate-600 rounded text-xs font-medium">
+                              {count}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Skill Categories Distribution */}
+            <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Skill Categories Distribution</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {Object.entries(analytics.categoryMap)
+                  .sort((a, b) => b[1] - a[1])
+                  .map(([category, count]) => (
+                    <div key={category} className="p-4 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg border border-indigo-200">
+                      <div className="text-2xl font-bold text-indigo-600 mb-1">{count}</div>
+                      <div className="text-sm font-medium text-slate-900">{category}</div>
+                      <div className="text-xs text-slate-600">skill instances</div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Skills Directory */}
+        {activeTab === 'directory' && (
+          <div className="space-y-4 sm:space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">Skills Directory</h2>
+            </div>
+
+            {/* Filters */}
+            <div className="bg-white rounded-xl p-4 sm:p-4 border border-slate-200 shadow-sm">
+              <div className="flex flex-col gap-3 sm:gap-4">
+                <div className="flex-1">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                    <input
+                      type="text"
+                      placeholder="Search employees or skills..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2 sm:py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <select
+                    value={selectedDepartment}
+                    onChange={(e) => setSelectedDepartment(e.target.value)}
+                    className="px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base"
+                  >
+                    <option value="all">All Departments</option>
+                    {departments.map(dept => (
+                      <option key={dept} value={dept}>{dept}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={selectedTeam}
+                    onChange={(e) => setSelectedTeam(e.target.value)}
+                    className="px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base"
+                  >
+                    <option value="all">All Teams</option>
+                    {teams.map(team => (
+                      <option key={team} value={team}>{team}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Employee Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              {filteredEmployees.map(employee => (
+                <div key={employee.id} className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-all">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+                    <div className="min-w-0">
+                      <h3 className="font-semibold text-base sm:text-lg text-slate-900 truncate">{employee.name}</h3>
+                      <p className="text-xs sm:text-sm text-slate-600">{employee.role}</p>
+                      <p className="text-xs text-slate-500 mt-1">{employee.department} • {employee.team}</p>
+                    </div>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap self-start ${
+                      employee.availability === 'Available' 
+                        ? 'bg-green-100 text-green-700'
+                        : employee.availability === 'Partially Available'
+                        ? 'bg-yellow-100 text-yellow-700'
+                        : 'bg-red-100 text-red-700'
+                    }`}>
+                      {employee.availability}
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="text-xs font-semibold text-slate-700 uppercase tracking-wide">Skills</div>
+                    <div className="flex flex-wrap gap-2">
+                      {employee.skills.map((skill, idx) => (
+                        <div key={idx} className="group relative">
+                          <span className="px-2.5 py-1 sm:px-3 sm:py-1 bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 rounded-full text-xs font-medium cursor-help">
+                            {skill.name}
+                          </span>
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+                            {skill.level} • {skill.category}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Projects */}
+        {activeTab === 'projects' && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-3xl font-bold text-slate-900">Project Matching</h2>
+              <button
+                onClick={() => setShowAddProject(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md"
+              >
+                <Plus className="w-4 h-4" />
+                New Project
+              </button>
+            </div>
+
+            {projects.map(project => {
+              const matches = matchEmployeesToProject(project);
+              return (
+                <div key={project.id} className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h3 className="text-xl font-semibold text-slate-900">{project.title}</h3>
+                      <p className="text-sm text-slate-600 mt-1">
+                        {project.department} • {project.duration} • {project.status}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="mb-4">
+                    <div className="text-sm font-semibold text-slate-700 mb-2">Required Skills:</div>
+                    <div className="flex flex-wrap gap-2">
+                      {project.requiredSkills.map(skill => (
+                        <span key={skill} className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium">
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="border-t border-slate-200 pt-4">
+                    <div className="text-sm font-semibold text-slate-900 mb-3">
+                      Top Matches ({matches.length} candidates)
+                    </div>
+                    <div className="space-y-3">
+                      {matches.slice(0, 5).map((match, idx) => (
+                        <div key={idx} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3">
+                              <span className="font-medium text-slate-900">{match.employee.name}</span>
+                              <span className="text-xs text-slate-600">{match.employee.role}</span>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                match.employee.availability === 'Available' 
+                                  ? 'bg-green-100 text-green-700'
+                                  : match.employee.availability === 'Partially Available'
+                                  ? 'bg-yellow-100 text-yellow-700'
+                                  : 'bg-red-100 text-red-700'
+                              }`}>
+                                {match.employee.availability}
+                              </span>
+                            </div>
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              {match.matchedSkills.map((skill, i) => (
+                                <span key={i} className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-xs">
+                                  {skill.name} ({skill.level})
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="ml-4 flex items-center gap-3">
+                            <div className="text-right">
+                              <div className="text-2xl font-bold text-indigo-600">
+                                {Math.round(match.matchPercentage)}%
+                              </div>
+                              <div className="text-xs text-slate-600">match</div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* Add Project Modal */}
+            {showAddProject && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-xl p-6 max-w-lg w-full">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-semibold">Add New Project</h3>
+                    <button onClick={() => setShowAddProject(false)} className="text-slate-400 hover:text-slate-600">
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <form onSubmit={(e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.target);
+                    const newProject = {
+                      id: projects.length + 1,
+                      title: formData.get('title'),
+                      department: formData.get('department'),
+                      duration: formData.get('duration'),
+                      requiredSkills: formData.get('skills').split(',').map(s => s.trim()),
+                      status: 'Open'
+                    };
+                    saveProjects([...projects, newProject]);
+                    setShowAddProject(false);
+                  }}>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Project Title</label>
+                        <input name="title" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Department</label>
+                        <input name="department" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Duration</label>
+                        <input name="duration" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Required Skills (comma-separated)</label>
+                        <input name="skills" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" placeholder="React, TypeScript, AWS" />
+                      </div>
+                    </div>
+                    <div className="mt-6 flex gap-3">
+                      <button type="submit" className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                        Add Project
+                      </button>
+                      <button type="button" onClick={() => setShowAddProject(false)} className="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50">
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Admin */}
+        {activeTab === 'admin' && (
+          <div className="space-y-4 sm:space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">Admin Panel</h2>
+              <button
+                onClick={() => setShowAddEmployee(true)}
+                className="flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md text-sm sm:text-base"
+              >
+                <Plus className="w-4 h-4" />
+                Add Employee
+              </button>
+            </div>
+
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[640px]">
+                  <thead className="bg-slate-50 border-b border-slate-200">
+                    <tr>
+                      <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Name</th>
+                      <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Role</th>
+                      <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider hidden sm:table-cell">Department</th>
+                      <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider hidden md:table-cell">Team</th>
+                      <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Skills</th>
+                      <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200">
+                    {employees.map(emp => (
+                      <tr key={emp.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap font-medium text-slate-900 text-sm">{emp.name}</td>
+                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-slate-600">{emp.role}</td>
+                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-slate-600 hidden sm:table-cell">{emp.department}</td>
+                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-slate-600 hidden md:table-cell">{emp.team}</td>
+                        <td className="px-4 sm:px-6 py-3 sm:py-4">
+                          <div className="flex flex-wrap gap-1">
+                            {emp.skills.slice(0, 3).map((skill, idx) => (
+                              <span key={idx} className="px-2 py-0.5 sm:py-1 bg-indigo-100 text-indigo-700 rounded text-xs">
+                                {skill.name}
+                              </span>
+                            ))}
+                            {emp.skills.length > 3 && (
+                              <span className="px-2 py-0.5 sm:py-1 bg-slate-100 text-slate-600 rounded text-xs">
+                                +{emp.skills.length - 3}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            emp.availability === 'Available' 
+                              ? 'bg-green-100 text-green-700'
+                              : emp.availability === 'Partially Available'
+                              ? 'bg-yellow-100 text-yellow-700'
+                              : 'bg-red-100 text-red-700'
+                          }`}>
+                            {emp.availability}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="px-4 py-3 bg-slate-50 border-t border-slate-200 text-xs text-slate-600 sm:hidden">
+                Swipe left to see more columns →
+              </div>
+            </div>
+
+            {/* Add Employee Modal */}
+            {showAddEmployee && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-semibold">Add New Employee</h3>
+                    <button onClick={() => setShowAddEmployee(false)} className="text-slate-400 hover:text-slate-600">
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <form onSubmit={(e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.target);
+                    const skillsInput = formData.get('skills');
+                    const skills = skillsInput.split('\n').filter(s => s.trim()).map(line => {
+                      const [name, level, category] = line.split(',').map(s => s.trim());
+                      return { name, level: level || 'Intermediate', category: category || 'General' };
+                    });
+                    
+                    const newEmployee = {
+                      id: employees.length + 1,
+                      name: formData.get('name'),
+                      department: formData.get('department'),
+                      team: formData.get('team'),
+                      role: formData.get('role'),
+                      availability: formData.get('availability'),
+                      skills
+                    };
+                    saveEmployees([...employees, newEmployee]);
+                    setShowAddEmployee(false);
+                  }}>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Name</label>
+                        <input name="name" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Role</label>
+                        <input name="role" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Department</label>
+                        <input name="department" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Team</label>
+                        <input name="team" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
+                      </div>
+                      <div className="col-span-2">
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Availability</label>
+                        <select name="availability" required className="w-full px-3 py-2 border border-slate-300 rounded-lg">
+                          <option value="Available">Available</option>
+                          <option value="Partially Available">Partially Available</option>
+                          <option value="Busy">Busy</option>
+                        </select>
+                      </div>
+                      <div className="col-span-2">
+                        <label className="block text-sm font-medium text-slate-700 mb-1">
+                          Skills (one per line: name, level, category)
+                        </label>
+                        <textarea 
+                          name="skills" 
+                          required 
+                          rows="6"
+                          className="w-full px-3 py-2 border border-slate-300 rounded-lg font-mono text-sm"
+                          placeholder="React, Expert, Programming&#10;TypeScript, Advanced, Programming&#10;Node.js, Intermediate, Backend"
+                        />
+                        <p className="text-xs text-slate-500 mt-1">Format: SkillName, Level, Category</p>
+                      </div>
+                    </div>
+                    <div className="mt-6 flex gap-3">
+                      <button type="submit" className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                        Add Employee
+                      </button>
+                      <button type="button" onClick={() => setShowAddEmployee(false)} className="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50">
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<SkillsMarketplace />);
+  </script>
+</body>
+</html>
