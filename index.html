@@ -431,9 +431,9 @@ window.storage = {
               </div>
               <div className="min-w-0">
                 <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent truncate" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-                  Skills Intelligence Platform
+                  OneCleanCo Skills Marketplace
                 </h1>
-                <p className="text-xs sm:text-sm text-slate-500 hidden sm:block">Enterprise Talent Analytics</p>
+                <p className="text-xs sm:text-sm text-slate-500 hidden sm:block">Power Your Future. Plug into theirs.</p>
               </div>
             </div>
             <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-slate-600 flex-shrink-0">
@@ -450,11 +450,11 @@ window.storage = {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex gap-1 min-w-max">
             {[
-              { id: 'self-service', label: 'Employee Portal', icon: Users },
+              { id: 'self-service', label: 'Submit Skills', icon: Users },
               { id: 'opportunities', label: 'Browse Projects', icon: Target },
               { id: 'analytics', label: 'Analytics Dashboard', icon: BarChart3 },
               { id: 'directory', label: 'Skills Directory', icon: Users },
-              { id: 'projects', label: 'Project Management', icon: Briefcase },
+              { id: 'projects', label: 'Launch a Project', icon: Briefcase },
               { id: 'admin', label: 'Admin', icon: Settings }
             ].map(tab => (
               <button
@@ -484,8 +484,8 @@ window.storage = {
         {activeTab === 'self-service' && (
           <div className="max-w-3xl mx-auto space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-slate-900 mb-2">Employee Skills Portal</h2>
-              <p className="text-slate-600">Submit your skills profile to help us match you with exciting short-term projects</p>
+              <h2 className="text-3xl font-bold text-slate-900 mb-2">OneCleanCo Skills Marketplace</h2>
+              <p className="text-slate-600">Tell us what you know and what you want to learn — we'll connect you with the right projects and learning opportunities</p>
             </div>
 
             {submissionSuccess ? (
@@ -709,7 +709,7 @@ window.storage = {
 
                   <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     <p className="text-sm text-blue-900">
-                      <strong>Tip:</strong> Be thorough with your skills! The more skills you add, the better we can match you with relevant projects.
+                      <strong>Tip:</strong> Be thorough with your skills! The more skills you add, the better we can match you with relevant projects. Think about skills you have outside of the workplace: what are you passionate about and good at? Example: Organising Events or Training / Mentoring.
                     </p>
                   </div>
                 </div>
@@ -722,7 +722,7 @@ window.storage = {
                     onChange={(e) => setGrowthAreasInput(e.target.value)}
                     rows="4"
                     className="w-full mt-3 px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Data Engineering\nAI Product Management\nFinance Operations"
+                    placeholder="Data Engineering Energy Trading Asset Management Finance Operations"
                   />
                 </div>
 
@@ -1063,7 +1063,7 @@ window.storage = {
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                 <div className="text-2xl sm:text-3xl font-bold text-slate-900">{analyticsEmployees.length}</div>
-                <div className="text-xs sm:text-sm text-slate-600">Employees in Scope</div>
+                <div className="text-xs sm:text-sm text-slate-600">Employees</div>
               </div>
               <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                 <div className="text-2xl sm:text-3xl font-bold text-slate-900">{Object.keys(analytics.skillMap).length}</div>
@@ -1071,7 +1071,7 @@ window.storage = {
               </div>
               <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                 <div className="text-2xl sm:text-3xl font-bold text-slate-900">{Object.keys(analytics.departmentSkills).length}</div>
-                <div className="text-xs sm:text-sm text-slate-600">Business Units in Scope</div>
+                <div className="text-xs sm:text-sm text-slate-600">Business Units</div>
               </div>
               <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                 <div className="text-2xl sm:text-3xl font-bold text-slate-900">{projects.length}</div>
@@ -1088,7 +1088,7 @@ window.storage = {
               <>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm">
-                  <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-4">Top Skills in Current Scope</h3>
+                  <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-4">Most common skills:</h3>
                   <div className="space-y-3">
                     {topSkills.map(([skill, data], index) => {
                       const maxCount = topSkills[0][1].count;
@@ -1114,7 +1114,7 @@ window.storage = {
                 </div>
 
                 <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm">
-                  <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-4">Top Skills Want To Learn</h3>
+                  <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-4">Employees want to learn:</h3>
                   {topGrowthAreas.length === 0 ? (
                     <div className="text-sm text-slate-600">No learning preferences captured yet.</div>
                   ) : (
