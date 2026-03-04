@@ -306,6 +306,24 @@ window.storage = {
     .sort((a, b) => b[1].count - a[1].count)
     .slice(0, 10);
 
+  const topGrowthAreasMap = {};
+  analyticsEmployees.forEach(emp => {
+    (emp.growthAreas || []).forEach(area => {
+      const raw = String(area || "").trim();
+      const key = raw.toLowerCase();
+      if (!key) return;
+      if (!topGrowthAreasMap[key]) {
+        topGrowthAreasMap[key] = { count: 0, label: raw };
+      }
+      topGrowthAreasMap[key].count++;
+    });
+  });
+
+  const topGrowthAreas = Object.entries(topGrowthAreasMap)
+    .sort((a, b) => b[1].count - a[1].count)
+    .slice(0, 10);
+
+  
   const filteredEmployees = employees.filter(emp => {
     const matchesSearch = emp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (emp.skills || []).some(s => s.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
@@ -1068,6 +1086,7 @@ window.storage = {
               </div>
             ) : (
               <>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm">
                   <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-4">Top Skills in Current Scope</h3>
                   <div className="space-y-3">
@@ -1093,6 +1112,37 @@ window.storage = {
                     })}
                   </div>
                 </div>
+
+                <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm">
+                  <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-4">Top Skills Want To Learn</h3>
+                  {topGrowthAreas.length === 0 ? (
+                    <div className="text-sm text-slate-600">No learning preferences captured yet.</div>
+                  ) : (
+                    <div className="space-y-3">
+                      {topGrowthAreas.map(([key, data], index) => {
+                        const maxCount = topGrowthAreas[0][1].count;
+                        const percentage = (data.count / maxCount) * 100;
+                        return (
+                          <div key={key} className="group">
+                            <div className="flex items-center justify-between mb-1">
+                              <div className="flex items-center gap-3">
+                                <div className="w-6 h-6 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-md flex items-center justify-center text-white text-xs font-bold">
+                                  {index + 1}
+                                </div>
+                                <span className="font-medium text-slate-900">{data.label}</span>
+                              </div>
+                              <span className="text-sm font-semibold text-slate-700">{data.count} employees</span>
+                            </div>
+                            <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                              <div className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full" style={{ width: `${percentage}%` }} />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
 
                 <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
                   <h3 className="text-lg font-semibold text-slate-900 mb-4">Skills by Business Unit</h3>
