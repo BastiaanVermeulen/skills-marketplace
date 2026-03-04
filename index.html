@@ -22,47 +22,137 @@ window.APP_CONFIG = {
   apiBaseUrl: "https://fytk13kn1e.execute-api.ap-southeast-2.amazonaws.com/prod"
 };
 
-// Storage polyfill using localStorage
-    window.storage = {
-      async get(key) {
-        try {
-          const value = localStorage.getItem(key);
-          return value ? { key, value, shared: false } : null;
-        } catch {
-          return null;
-        }
-      },
-      async set(key, value) {
-        try {
-          localStorage.setItem(key, value);
-          return { key, value, shared: false };
-        } catch {
-          return null;
-        }
-      },
-      async delete(key) {
-        try {
-          localStorage.removeItem(key);
-          return { key, deleted: true, shared: false };
-        } catch {
-          return null;
-        }
-      },
-      async list(prefix) {
-        try {
-          const keys = [];
-          for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (!prefix || key.startsWith(prefix)) {
-              keys.push(key);
-            }
-          }
-          return { keys, prefix, shared: false };
-        } catch {
-          return { keys: [], shared: false };
-        }
+// Shared storage using AWS API Gateway + Lambda + DynamoDB
+// Keeps the existing app contract: get/set JSON blobs per key (employees/projects/interests).
+window.storage = {
+  async get(key) {
+    const base = window.APP_CONFIG?.apiBaseUrl;
+    const allowed = new Set(["employees", "projects", "interests"]);
+    if (!base || !allowed.has(key)) {
+      // Fallback to localStorage for any non-collection keys
+      try {
+        const value = localStorage.getItem(key);
+        return value ? { key, value, shared: false } : null;
+      } catch {
+        return null;
       }
-    };
+    }
+
+    try {
+      const res = await fetch(`${base}/${key}`);
+      if (!res.ok) throw new Error(`GET ${key} failed: ${res.status}`);
+      const items = await res.json();
+      const visible = Array.isArray(items) ? items.filter((x) => !x?._deleted) : [];
+      return { key, value: JSON.stringify(visible), shared: true };
+    } catch (e) {
+      console.error("storage.get error:", e);
+      return { key, value: JSON.stringify([]), shared: true, error: String(e?.message || e) };
+    }
+  },
+
+  async set(key, value) {
+    const base = window.APP_CONFIG?.apiBaseUrl;
+    const allowed = new Set(["employees", "projects", "interests"]);
+    if (!base || !allowed.has(key)) {
+      // Fallback to localStorage for any non-collection keys
+      try {
+        localStorage.setItem(key, value);
+        return { key, value, shared: false };
+      } catch {
+        return null;
+      }
+    }
+
+    let next = [];
+    try {
+      next = JSON.parse(value || "[]");
+      if (!Array.isArray(next)) next = [];
+    } catch {
+      next = [];
+    }
+
+    // Pull current server state so deletes persist (soft delete)
+    let current = [];
+    try {
+      const res = await fetch(`${base}/${key}`);
+      if (res.ok) {
+        const j = await res.json();
+        current = Array.isArray(j) ? j : [];
+      }
+    } catch {}
+
+    const nextById = new Map();
+    for (const item of next) {
+      const id = item?.id || (crypto?.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()));
+      const clean = { ...(item || {}), id, _deleted: false };
+      nextById.set(id, clean);
+    }
+
+    const currentById = new Map();
+    for (const item of current) {
+      if (item?.id) currentById.set(item.id, item);
+    }
+
+    const reqs = [];
+
+    // Upsert new/updated items
+    for (const [id, item] of nextById.entries()) {
+      reqs.push(
+        fetch(`${base}/${key}/${encodeURIComponent(id)}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(item),
+        }).then((r) => {
+          if (!r.ok) throw new Error(`PUT ${key}/${id} failed: ${r.status}`);
+        })
+      );
+    }
+
+    // Soft-delete items removed from the list
+    for (const [id, existing] of currentById.entries()) {
+      if (!nextById.has(id) && !existing?._deleted) {
+        const tombstone = { ...existing, _deleted: true };
+        reqs.push(
+          fetch(`${base}/${key}/${encodeURIComponent(id)}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(tombstone),
+          }).then((r) => {
+            if (!r.ok) throw new Error(`PUT (delete) ${key}/${id} failed: ${r.status}`);
+          })
+        );
+      }
+    }
+
+    try {
+      await Promise.all(reqs);
+      return { key, value: JSON.stringify(Array.from(nextById.values())), shared: true };
+    } catch (e) {
+      console.error("storage.set error:", e);
+      return { key, value, shared: true, error: String(e?.message || e) };
+    }
+  },
+
+  async delete(key) {
+    // For collection keys, do nothing destructive (use set with empty array to soft-delete all).
+    try {
+      localStorage.removeItem(key);
+      return { key, deleted: true, shared: false };
+    } catch {
+      return null;
+    }
+  },
+
+  async list(prefix) {
+    // For compatibility; this app mainly uses get/set.
+    try {
+      const keys = ["employees", "projects", "interests"].filter(k => !prefix || k.startsWith(prefix));
+      return { keys, prefix, shared: true };
+    } catch {
+      return { keys: [], shared: true };
+    }
+  }
+};
 
     // Lucide icon compatibility helpers (works with non-React UMD builds)
     const iconFallback = (props = {}) => React.createElement('span', {
