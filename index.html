@@ -199,7 +199,6 @@ window.storage = {
       const [selectedProjectForInterest, setSelectedProjectForInterest] = useState(null);
       const [interestEmailSubject, setInterestEmailSubject] = useState('');
       const [interestEmailBody, setInterestEmailBody] = useState('');
-      const [emailClientOpened, setEmailClientOpened] = useState(false);
       const [expandedSkills, setExpandedSkills] = useState({});
       const [isSubmitting, setIsSubmitting] = useState(false);
       const [submissionSuccess, setSubmissionSuccess] = useState(false);
@@ -399,10 +398,9 @@ window.storage = {
   };
 
   const handleExpressInterest = (project) => {
-    setSelectedProjectForInterest(project);
     setInterestEmailSubject(`I am interested in the ${project.title} project`);
     setInterestEmailBody('Hi, I am interested in participating in this project. What are the next steps?');
-    setEmailClientOpened(false);
+    setSelectedProjectForInterest({ ...project, emailClientOpened: false });
     setShowEmailModal(true);
   };
 
@@ -414,7 +412,7 @@ window.storage = {
 
     try {
       window.location.assign(mailtoLink);
-      setEmailClientOpened(true);
+      setSelectedProjectForInterest((currentProject) => currentProject ? { ...currentProject, emailClientOpened: true } : currentProject);
     } catch (error) {
       console.error('Failed to launch email client:', error);
       alert('Unable to open your email client right now. Please try again.');
@@ -422,7 +420,7 @@ window.storage = {
   };
 
   const handleConfirmInterestSubmitted = async () => {
-    if (!selectedProjectForInterest) return;
+    if (!selectedProjectForInterest || !selectedProjectForInterest.emailClientOpened) return;
 
     const newInterest = {
       id: Date.now(),
@@ -433,8 +431,8 @@ window.storage = {
 
     await saveInterests([...interests, newInterest]);
     setShowEmailModal(false);
+    setSelectedProjectForInterest(null);
     setShowInterestModal(true);
-    setEmailClientOpened(false);
   };
 
   const handleDeleteEmployee = async (employeeId) => {
@@ -1678,7 +1676,7 @@ window.storage = {
                 <button
                   onClick={() => {
                     setShowEmailModal(false);
-                    setEmailClientOpened(false);
+                    setSelectedProjectForInterest(null);
                   }}
                   className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50"
                 >
@@ -1692,8 +1690,8 @@ window.storage = {
                 </button>
                 <button
                   onClick={handleConfirmInterestSubmitted}
-                  disabled={!emailClientOpened}
-                  className={`px-4 py-2 text-white rounded-lg ${emailClientOpened ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-slate-300 cursor-not-allowed'}`}
+                  disabled={!selectedProjectForInterest?.emailClientOpened}
+                  className={`px-4 py-2 text-white rounded-lg ${selectedProjectForInterest?.emailClientOpened ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-slate-300 cursor-not-allowed'}`}
                 >
                   I Have Sent the Email
                 </button>
