@@ -923,6 +923,14 @@ window.storage = {
                                   <span className="hidden sm:inline">•</span>
                                   <span>{project.duration}</span>
                                 </div>
+                                {project.manager && (
+                                  <p className="text-xs sm:text-sm text-slate-500 mt-2">
+                                    <span className="font-medium text-slate-700">Responsible Manager:</span> {project.manager}
+                                  </p>
+                                )}
+                                {project.description && (
+                                  <p className="text-xs sm:text-sm text-slate-600 mt-2">{project.description}</p>
+                                )}
                               </div>
                               <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap self-start">
                                 {project.status}
