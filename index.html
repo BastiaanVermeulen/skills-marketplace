@@ -433,6 +433,35 @@ window.storage = {
     setShowEmailModal(false);
     setSelectedProjectForInterest(null);
     setShowInterestModal(true);
+    setSelectedProjectForInterest(project);
+    setInterestEmailSubject(`I am interested in the ${project.title} project`);
+    setInterestEmailBody('Hi, I am interested in participating in this project. What are the next steps?');
+    setShowEmailModal(true);
+  };
+
+  const handleSendInterestEmail = async () => {
+    if (!selectedProjectForInterest) return;
+
+    const recipient = 'onecleanco@cleancoqld.com.au';
+    const mailtoLink = `mailto:${recipient}?subject=${encodeURIComponent(interestEmailSubject)}&body=${encodeURIComponent(interestEmailBody)}`;
+
+    try {
+      window.location.href = mailtoLink;
+
+      const newInterest = {
+        id: Date.now(),
+        projectId: selectedProjectForInterest.id,
+        projectTitle: selectedProjectForInterest.title,
+        createdAt: new Date().toISOString()
+      };
+
+      await saveInterests([...interests, newInterest]);
+      setShowEmailModal(false);
+      setShowInterestModal(true);
+    } catch (error) {
+      console.error('Failed to launch email client:', error);
+      alert('Unable to open your email client right now. Please try again.');
+    }
   };
 
   const handleDeleteEmployee = async (employeeId) => {
@@ -1678,6 +1707,9 @@ window.storage = {
                     setShowEmailModal(false);
                     setSelectedProjectForInterest(null);
                   }}
+              <div className="mt-5 flex justify-end gap-3">
+                <button
+                  onClick={() => setShowEmailModal(false)}
                   className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50"
                 >
                   Cancel
@@ -1694,6 +1726,9 @@ window.storage = {
                   className={`px-4 py-2 text-white rounded-lg ${selectedProjectForInterest?.emailClientOpened ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-slate-300 cursor-not-allowed'}`}
                 >
                   I Have Sent the Email
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                >
+                  Send Email
                 </button>
               </div>
             </div>
