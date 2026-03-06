@@ -461,7 +461,7 @@ window.storage = {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-sky-50">
       {/* Header */}
       <header className="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
@@ -508,7 +508,7 @@ window.storage = {
                 style={{ pointerEvents: 'auto', cursor: 'pointer' }}
                 className={`flex items-center gap-2 px-4 sm:px-6 py-3 border-b-2 transition-all whitespace-nowrap text-sm sm:text-base ${
                   activeTab === tab.id
-                    ? 'border-indigo-600 text-indigo-600 bg-indigo-50'
+                    ? 'border-sky-600 text-sky-600 bg-sky-50'
                     : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                 }`}
               >
@@ -541,7 +541,7 @@ window.storage = {
                 <div className="flex gap-3 justify-center mb-4">
                   <button
                     onClick={() => setActiveTab('opportunities')}
-                    className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 font-semibold shadow-md"
+                    className="px-6 py-3 bg-gradient-to-r from-sky-600 to-sky-600 text-white rounded-lg hover:from-sky-700 hover:to-sky-700 font-semibold shadow-md"
                   >
                     Browse Projects
                   </button>
@@ -611,7 +611,7 @@ window.storage = {
                     <input 
                       name="name" 
                       required 
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
                       placeholder="John Smith"
                     />
                   </div>
@@ -621,7 +621,7 @@ window.storage = {
                     <input 
                       name="role" 
                       required 
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
                       placeholder="Senior Software Engineer"
                     />
                   </div>
@@ -631,7 +631,7 @@ window.storage = {
                     <input 
                       name="department" 
                       required 
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
                       placeholder="Engineering"
                     />
                   </div>
@@ -641,7 +641,7 @@ window.storage = {
                     <input 
                       name="team" 
                       required 
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
                       placeholder="Backend"
                     />
                   </div>
@@ -651,7 +651,7 @@ window.storage = {
                     <select 
                       name="availability" 
                       required 
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
                     >
                       <option value="Available">Available - Ready for new projects</option>
                       <option value="Partially Available">Partially Available - Can take on limited work</option>
@@ -669,7 +669,7 @@ window.storage = {
                     <button
                       type="button"
                       onClick={() => setSkillInputs([...skillInputs, { name: '', level: 'Intermediate', category: 'General' }])}
-                      className="flex items-center gap-2 px-3 py-2 text-sm bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-colors"
+                      className="flex items-center gap-2 px-3 py-2 text-sm bg-sky-50 text-sky-600 rounded-lg hover:bg-sky-100 transition-colors"
                     >
                       <Plus className="w-4 h-4" />
                       Add Skill
@@ -688,7 +688,7 @@ window.storage = {
                               newSkills[index].name = e.target.value;
                               setSkillInputs(newSkills);
                             }}
-                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
                             placeholder="e.g., Python, Project Management, Data Analysis"
                             required={index === 0}
                           />
@@ -701,7 +701,7 @@ window.storage = {
                               newSkills[index].level = e.target.value;
                               setSkillInputs(newSkills);
                             }}
-                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
                           >
                             <option value="Beginner">Beginner</option>
                             <option value="Intermediate">Intermediate</option>
@@ -717,7 +717,7 @@ window.storage = {
                               newSkills[index].category = e.target.value;
                               setSkillInputs(newSkills);
                             }}
-                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
                           >
                             <option value="General">General</option>
                             <option value="Programming">Programming</option>
@@ -762,7 +762,7 @@ window.storage = {
                     value={growthAreasInput}
                     onChange={(e) => setGrowthAreasInput(e.target.value)}
                     rows="4"
-                    className="w-full mt-3 px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full mt-3 px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
                     placeholder="Data Engineering Energy Trading Asset Management Finance Operations"
                   />
                 </div>
@@ -775,7 +775,7 @@ window.storage = {
                       console.log('Submit button clicked', { isSubmitting });
                     }}
                     style={{ pointerEvents: isSubmitting ? 'none' : 'auto', cursor: isSubmitting ? 'not-allowed' : 'pointer' }}
-                    className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-4 bg-gradient-to-r from-sky-600 to-sky-600 text-white font-semibold rounded-lg hover:from-sky-700 hover:to-sky-700 transition-all shadow-lg text-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isSubmitting ? 'Submitting...' : 'Submit My Skills Profile'}
                   </button>
@@ -786,7 +786,7 @@ window.storage = {
               </form>
             )}
 
-            <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-6 border border-indigo-200">
+            <div className="bg-gradient-to-br from-sky-50 to-sky-50 rounded-xl p-6 border border-sky-200">
               <h3 className="font-semibold text-slate-900 mb-3">📋 Shareable Link</h3>
               <p className="text-sm text-slate-700 mb-3">
                 Share this URL with employees so they can submit their own profiles:
@@ -803,7 +803,7 @@ window.storage = {
                     navigator.clipboard.writeText(window.location.href);
                     alert('Link copied to clipboard!');
                   }}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm font-medium"
+                  className="px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 text-sm font-medium"
                 >
                   Copy Link
                 </button>
@@ -834,14 +834,14 @@ window.storage = {
                       placeholder="Search projects or skills..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base"
+                      className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm sm:text-base"
                     />
                   </div>
                 </div>
                 <select
                   value={selectedDepartment}
                   onChange={(e) => setSelectedDepartment(e.target.value)}
-                  className="px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base"
+                  className="px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm sm:text-base"
                 >
                   <option value="all">All Departments</option>
                   {departments.map(dept => (
@@ -864,7 +864,7 @@ window.storage = {
                           onClick={() => setSearchQuery(isActive ? '' : skill)}
                           className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
                             isActive
-                              ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
+                              ? 'bg-gradient-to-r from-sky-600 to-sky-600 text-white shadow-md'
                               : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                           }`}
                         >
@@ -915,7 +915,7 @@ window.storage = {
                           <div key={project.id} className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-lg transition-all group">
                             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
                               <div className="flex-1 min-w-0">
-                                <h4 className="text-lg sm:text-xl font-semibold text-slate-900 mb-2 group-hover:text-indigo-600 transition-colors">
+                                <h4 className="text-lg sm:text-xl font-semibold text-slate-900 mb-2 group-hover:text-sky-600 transition-colors">
                                   {project.title}
                                 </h4>
                                 <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-slate-600">
@@ -942,8 +942,8 @@ window.storage = {
                                       key={i} 
                                       className={`px-2.5 py-1 sm:px-3 sm:py-1 rounded-full text-xs sm:text-sm font-medium transition-all ${
                                         isHighlighted 
-                                          ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
-                                          : 'bg-indigo-100 text-indigo-700'
+                                          ? 'bg-gradient-to-r from-sky-600 to-sky-600 text-white shadow-md'
+                                          : 'bg-sky-100 text-sky-700'
                                       }`}
                                     >
                                       {skill}
@@ -967,7 +967,7 @@ window.storage = {
                                 onClick={() => {
                                   handleExpressInterest(project);
                                 }}
-                                className="flex-1 px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md text-sm sm:text-base"
+                                className="flex-1 px-4 py-3 bg-gradient-to-r from-sky-600 to-sky-600 text-white font-semibold rounded-lg hover:from-sky-700 hover:to-sky-700 transition-all shadow-md text-sm sm:text-base"
                               >
                                 Express Interest
                               </button>
@@ -991,7 +991,7 @@ window.storage = {
                           setSearchQuery('');
                           setSelectedDepartment('all');
                         }}
-                        className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm sm:text-base"
+                        className="px-6 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 text-sm sm:text-base"
                       >
                         Clear All Filters
                       </button>
@@ -1002,7 +1002,7 @@ window.storage = {
             })()}
 
             {/* Tips for Employees */}
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-6 border border-blue-200">
+            <div className="bg-gradient-to-br from-blue-50 to-sky-50 rounded-xl p-4 sm:p-6 border border-blue-200">
               <h3 className="text-sm sm:text-base font-semibold text-slate-900 mb-3 flex items-center gap-2">
                 <svg className="w-5 h-5 text-blue-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
@@ -1011,19 +1011,19 @@ window.storage = {
               </h3>
               <ul className="text-xs sm:text-sm text-slate-700 space-y-2">
                 <li className="flex items-start gap-2">
-                  <span className="text-indigo-600 font-bold flex-shrink-0">•</span>
+                  <span className="text-sky-600 font-bold flex-shrink-0">•</span>
                   <span><strong>Search by skill:</strong> Click any skill tag above or type in the search box to filter projects</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-indigo-600 font-bold flex-shrink-0">•</span>
+                  <span className="text-sky-600 font-bold flex-shrink-0">•</span>
                   <span><strong>Browse by department:</strong> Use the department filter to see projects in specific teams</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-indigo-600 font-bold flex-shrink-0">•</span>
+                  <span className="text-sky-600 font-bold flex-shrink-0">•</span>
                   <span><strong>Express interest:</strong> Click "Express Interest" on projects that excite you - you don't need to have all the required skills</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-indigo-600 font-bold flex-shrink-0">•</span>
+                  <span className="text-sky-600 font-bold flex-shrink-0">•</span>
                   <span><strong>Learn more:</strong> Contact the project manager to understand more about the project scope and expectations</span>
                 </li>
               </ul>
@@ -1055,7 +1055,7 @@ window.storage = {
                         setAnalyticsTeam('all');
                       }
                     }}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm"
                   >
                     <option value="enterprise">Enterprise wide</option>
                     <option value="team">Business Unit / Team</option>
@@ -1069,7 +1069,7 @@ window.storage = {
                       setAnalyticsDepartment(e.target.value);
                       setAnalyticsTeam('all');
                     }}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm"
                   >
                     <option value="all">All Business Units</option>
                     {departments.map(dept => (
@@ -1082,7 +1082,7 @@ window.storage = {
                   <select
                     value={analyticsTeam}
                     onChange={(e) => setAnalyticsTeam(e.target.value)}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm"
                   >
                     <option value="all">All Teams</option>
                     {analyticsTeams.map(team => (
@@ -1131,7 +1131,7 @@ window.storage = {
                         <div key={skill} className="group">
                           <div className="flex items-center justify-between mb-1">
                             <div className="flex items-center gap-3">
-                              <div className="w-6 h-6 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-md flex items-center justify-center text-white text-xs font-bold">
+                              <div className="w-6 h-6 bg-gradient-to-br from-sky-500 to-sky-500 rounded-md flex items-center justify-center text-white text-xs font-bold">
                                 {index + 1}
                               </div>
                               <span className="font-medium text-slate-900">{skill}</span>
@@ -1139,7 +1139,7 @@ window.storage = {
                             <span className="text-sm font-semibold text-slate-700">{data.count} employees</span>
                           </div>
                           <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                            <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full" style={{ width: `${percentage}%` }} />
+                            <div className="h-full bg-gradient-to-r from-sky-500 to-sky-500 rounded-full" style={{ width: `${percentage}%` }} />
                           </div>
                         </div>
                       );
@@ -1233,7 +1233,7 @@ window.storage = {
                       placeholder="Search employees or skills..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 sm:py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base"
+                      className="w-full pl-10 pr-4 py-2 sm:py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm sm:text-base"
                     />
                   </div>
                 </div>
@@ -1241,7 +1241,7 @@ window.storage = {
                   <select
                     value={selectedDepartment}
                     onChange={(e) => setSelectedDepartment(e.target.value)}
-                    className="px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base"
+                    className="px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm sm:text-base"
                   >
                     <option value="all">All Departments</option>
                     {departments.map(dept => (
@@ -1251,7 +1251,7 @@ window.storage = {
                   <select
                     value={selectedTeam}
                     onChange={(e) => setSelectedTeam(e.target.value)}
-                    className="px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base"
+                    className="px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm sm:text-base"
                   >
                     <option value="all">All Teams</option>
                     {teams.map(team => (
@@ -1287,7 +1287,7 @@ window.storage = {
                     <div className="flex flex-wrap gap-2">
                       {employee.skills.map((skill, idx) => (
                         <div key={idx} className="group relative">
-                          <span className="px-2.5 py-1 sm:px-3 sm:py-1 bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 rounded-full text-xs font-medium cursor-help">
+                          <span className="px-2.5 py-1 sm:px-3 sm:py-1 bg-gradient-to-r from-sky-100 to-sky-100 text-sky-700 rounded-full text-xs font-medium cursor-help">
                             {skill.name}
                           </span>
                           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
@@ -1322,7 +1322,7 @@ window.storage = {
               <h2 className="text-3xl font-bold text-slate-900">Project Matching</h2>
               <button
                 onClick={() => setShowAddProject(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md"
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-sky-600 to-sky-600 text-white rounded-lg hover:from-sky-700 hover:to-sky-700 transition-all shadow-md"
               >
                 <Plus className="w-4 h-4" />
                 New Project
@@ -1346,7 +1346,7 @@ window.storage = {
                     <div className="text-sm font-semibold text-slate-700 mb-2">Required Skills:</div>
                     <div className="flex flex-wrap gap-2">
                       {project.requiredSkills.map(skill => (
-                        <span key={skill} className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium">
+                        <span key={skill} className="px-3 py-1 bg-sky-100 text-sky-700 rounded-full text-sm font-medium">
                           {skill}
                         </span>
                       ))}
@@ -1376,7 +1376,7 @@ window.storage = {
                             </div>
                             <div className="flex flex-wrap gap-1 mt-2">
                               {match.matchedSkills.map((skill, i) => (
-                                <span key={i} className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-xs">
+                                <span key={i} className="px-2 py-1 bg-sky-100 text-sky-700 rounded text-xs">
                                   {skill.name} ({skill.level})
                                 </span>
                               ))}
@@ -1384,7 +1384,7 @@ window.storage = {
                           </div>
                           <div className="ml-4 flex items-center gap-3">
                             <div className="text-right">
-                              <div className="text-2xl font-bold text-indigo-600">
+                              <div className="text-2xl font-bold text-sky-600">
                                 {Math.round(match.matchPercentage)}%
                               </div>
                               <div className="text-xs text-slate-600">match</div>
@@ -1416,6 +1416,8 @@ window.storage = {
                       title: formData.get('title'),
                       department: formData.get('department'),
                       duration: formData.get('duration'),
+                      manager: formData.get('manager'),
+                      description: formData.get('description'),
                       requiredSkills: formData.get('skills').split(',').map(s => s.trim()),
                       status: 'Open'
                     };
@@ -1426,6 +1428,14 @@ window.storage = {
                       <div>
                         <label className="block text-sm font-medium text-slate-700 mb-1">Project Title</label>
                         <input name="title" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Responsible Manager</label>
+                        <input name="manager" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" placeholder="Full name" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Brief Project Description</label>
+                        <textarea name="description" required rows="3" className="w-full px-3 py-2 border border-slate-300 rounded-lg" placeholder="What is this project about and what will participants be doing?" />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-slate-700 mb-1">Business Unit</label>
@@ -1441,7 +1451,7 @@ window.storage = {
                       </div>
                     </div>
                     <div className="mt-6 flex gap-3">
-                      <button type="submit" className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                      <button type="submit" className="flex-1 px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700">
                         Add Project
                       </button>
                       <button type="button" onClick={() => setShowAddProject(false)} className="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50">
@@ -1462,7 +1472,7 @@ window.storage = {
               <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">Admin Panel</h2>
               <button
                 onClick={() => setShowAddEmployee(true)}
-                className="flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md text-sm sm:text-base"
+                className="flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-sky-600 to-sky-600 text-white rounded-lg hover:from-sky-700 hover:to-sky-700 transition-all shadow-md text-sm sm:text-base"
               >
                 <Plus className="w-4 h-4" />
                 Add Employee
@@ -1497,7 +1507,7 @@ window.storage = {
                         <td className="px-4 sm:px-6 py-3 sm:py-4">
                           <div className="flex flex-wrap gap-1">
                             {emp.skills.slice(0, 3).map((skill, idx) => (
-                              <span key={idx} className="px-2 py-0.5 sm:py-1 bg-indigo-100 text-indigo-700 rounded text-xs">
+                              <span key={idx} className="px-2 py-0.5 sm:py-1 bg-sky-100 text-sky-700 rounded text-xs">
                                 {skill.name}
                               </span>
                             ))}
@@ -1620,7 +1630,7 @@ window.storage = {
                       </div>
                     </div>
                     <div className="mt-6 flex gap-3">
-                      <button type="submit" className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                      <button type="submit" className="flex-1 px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700">
                         Add Employee
                       </button>
                       <button type="button" onClick={() => setShowAddEmployee(false)} className="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50">
@@ -1684,7 +1694,7 @@ window.storage = {
                 </button>
                 <button
                   onClick={handleSendInterestEmail}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                  className="px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700"
                 >
                   Send via Outlook
                 </button>
@@ -1703,7 +1713,7 @@ window.storage = {
               <div className="flex justify-end">
                 <button
                   onClick={() => setShowInterestModal(false)}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                  className="px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700"
                 >
                   OK
                 </button>
