@@ -194,7 +194,11 @@ window.storage = {
       const [analyticsTeam, setAnalyticsTeam] = useState('all');
       const [showAddProject, setShowAddProject] = useState(false);
       const [showAddEmployee, setShowAddEmployee] = useState(false);
+      const [showEmailModal, setShowEmailModal] = useState(false);
       const [showInterestModal, setShowInterestModal] = useState(false);
+      const [selectedProjectForInterest, setSelectedProjectForInterest] = useState(null);
+      const [interestEmailSubject, setInterestEmailSubject] = useState('');
+      const [interestEmailBody, setInterestEmailBody] = useState('');
       const [expandedSkills, setExpandedSkills] = useState({});
       const [isSubmitting, setIsSubmitting] = useState(false);
       const [submissionSuccess, setSubmissionSuccess] = useState(false);
@@ -393,16 +397,52 @@ window.storage = {
       .filter(Boolean);
   };
 
-  const handleExpressInterest = async (project) => {
+  const handleExpressInterest = (project) => {
+    setInterestEmailSubject(`I am interested in the ${project.title} project`);
+    setInterestEmailBody('Hi, I am interested in participating in this project. What are the next steps?');
+    setSelectedProjectForInterest({ ...project, emailClientOpened: false });
+    setShowEmailModal(true);
+  };
+
+  const handleConfirmInterestSubmitted = async () => {
+    if (!selectedProjectForInterest || !selectedProjectForInterest.emailClientOpened) return;
+
     const newInterest = {
       id: Date.now(),
-      projectId: project.id,
-      projectTitle: project.title,
+      projectId: selectedProjectForInterest.id,
+      projectTitle: selectedProjectForInterest.title,
       createdAt: new Date().toISOString()
     };
 
     await saveInterests([...interests, newInterest]);
+    setShowEmailModal(false);
+    setSelectedProjectForInterest(null);
     setShowInterestModal(true);
+  };
+
+  const handleSendInterestEmail = async () => {
+    if (!selectedProjectForInterest) return;
+
+    const recipient = 'onecleanco@cleancoqld.com.au';
+    const mailtoLink = `mailto:${recipient}?subject=${encodeURIComponent(interestEmailSubject)}&body=${encodeURIComponent(interestEmailBody)}`;
+
+    try {
+      window.location.href = mailtoLink;
+
+      const newInterest = {
+        id: Date.now(),
+        projectId: selectedProjectForInterest.id,
+        projectTitle: selectedProjectForInterest.title,
+        createdAt: new Date().toISOString()
+      };
+
+      await saveInterests([...interests, newInterest]);
+      setShowEmailModal(false);
+      setShowInterestModal(true);
+    } catch (error) {
+      console.error('Failed to launch email client:', error);
+      alert('Unable to open your email client right now. Please try again.');
+    }
   };
 
   const handleDeleteEmployee = async (employeeId) => {
@@ -426,13 +466,13 @@ window.storage = {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-sky-300 to-sky-500 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-orange-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
                 <Award className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-sky-300 to-sky-500 bg-clip-text text-transparent truncate" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-                  Power Your Future. Plug into theirs.
-                </h1>
+              <h1 className="text-lg sm:text-2xl font-bold text-slate-900 truncate" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+              Power Your Future. Plug into theirs.
+              </h1>
                 <p className="text-xs sm:text-sm text-slate-500 hidden sm:block">OneCleanCo Skills Marketplace</p>
               </div>
             </div>
@@ -1600,12 +1640,82 @@ window.storage = {
           </div>
         )}
 
+        {showEmailModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowEmailModal(false)}>
+            <div className="bg-white rounded-xl p-6 max-w-lg w-full" onClick={(e) => e.stopPropagation()}>
+              <h3 className="text-lg font-semibold text-slate-900 mb-1">Express Interest</h3>
+              <p className="text-sm text-slate-600 mb-4">
+                Send your expression of interest email for <strong>{selectedProjectForInterest?.title}</strong>.
+              </p>
+
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">To</label>
+                  <input
+                    type="text"
+                    value="onecleanco@cleancoqld.com.au"
+                    readOnly
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-slate-50 text-slate-700"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Subject</label>
+                  <input
+                    type="text"
+                    value={interestEmailSubject}
+                    onChange={(e) => setInterestEmailSubject(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Body</label>
+                  <textarea
+                    rows="4"
+                    value={interestEmailBody}
+                    onChange={(e) => setInterestEmailBody(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg"
+                  />
+                </div>
+              </div>
+
+              <p className="text-xs text-slate-500 mt-4">
+                After sending the email in Outlook, click "I Have Sent the Email" below.
+              </p>
+
+              <div className="mt-5 flex flex-wrap justify-end gap-3">
+                <button
+                  onClick={() => {
+                    setShowEmailModal(false);
+                    setSelectedProjectForInterest(null);
+                  }}
+                  className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSendInterestEmail}
+                  className="px-4 py-2 border border-indigo-600 text-indigo-700 rounded-lg hover:bg-indigo-50"
+                >
+                  Open Email
+                </button>
+                <button
+                  onClick={handleConfirmInterestSubmitted}
+                  disabled={!selectedProjectForInterest?.emailClientOpened}
+                  className={`px-4 py-2 text-white rounded-lg ${selectedProjectForInterest?.emailClientOpened ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-slate-300 cursor-not-allowed'}`}
+                >
+                  I Have Sent the Email
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {showInterestModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowInterestModal(false)}>
             <div className="bg-white rounded-xl p-6 max-w-lg w-full" onClick={(e) => e.stopPropagation()}>
               <h3 className="text-lg font-semibold text-slate-900 mb-3">Interest submitted</h3>
               <p className="text-sm text-slate-700 mb-5">
-                Thanks for your interest in this project! The responsible manager will review your profile and will be in touch if you're a good fit. Check your email for updates.
+                Thanks for your interest in this project! The responsible manager will review your profile and be in touch!
               </p>
               <div className="flex justify-end">
                 <button
