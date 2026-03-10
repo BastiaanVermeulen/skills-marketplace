@@ -190,6 +190,7 @@ window.storage = {
       const [searchQuery, setSearchQuery] = useState('');
       const [selectedDepartment, setSelectedDepartment] = useState('all');
       const [selectedTeam, setSelectedTeam] = useState('all');
+      const [selectedEngagement, setSelectedEngagement] = useState('all');
       const [analyticsDepartment, setAnalyticsDepartment] = useState('all');
       const [analyticsTeam, setAnalyticsTeam] = useState('all');
       const [showAddProject, setShowAddProject] = useState(false);
@@ -204,6 +205,8 @@ window.storage = {
       const [submissionSuccess, setSubmissionSuccess] = useState(false);
       const [skillInputs, setSkillInputs] = useState([{ name: '', level: 'Intermediate', category: 'General' }]);
       const [growthAreasInput, setGrowthAreasInput] = useState('');
+      const [willingToMentor, setWillingToMentor] = useState(false);
+      const [willingToPresent, setWillingToPresent] = useState(false);
       const [interests, setInterests] = useState([]);
 
       useEffect(() => {
@@ -334,7 +337,11 @@ window.storage = {
       (emp.growthAreas || []).some(area => area.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesDept = selectedDepartment === 'all' || emp.department === selectedDepartment;
     const matchesTeam = selectedTeam === 'all' || emp.team === selectedTeam;
-    return matchesSearch && matchesDept && matchesTeam;
+    const matchesEngagement =
+      selectedEngagement === 'all' ||
+      (selectedEngagement === 'mentor' && emp.willingToMentor) ||
+      (selectedEngagement === 'present' && emp.willingToPresent);
+    return matchesSearch && matchesDept && matchesTeam && matchesEngagement;
   });
 
   const matchEmployeesToProject = (project) => {
@@ -398,8 +405,8 @@ window.storage = {
   };
 
   const handleExpressInterest = (project) => {
-    setInterestEmailSubject(`I am interested in the ${project.title} project`);
-    setInterestEmailBody('Hi, I am interested in participating in this project. What are the next steps?');
+    setInterestEmailSubject(`I am interested in the ${project.title} opportunity`);
+    setInterestEmailBody('Hi, I am interested in participating in this opportunity. What are the next steps?');
     setSelectedProjectForInterest({ ...project, emailClientOpened: false });
     setShowEmailModal(true);
   };
@@ -492,10 +499,10 @@ window.storage = {
           <div className="flex gap-1 min-w-max">
             {[
               { id: 'self-service', label: 'Submit Skills', icon: Users },
-              { id: 'opportunities', label: 'Browse Projects', icon: Target },
+              { id: 'opportunities', label: 'Browse Opportunities', icon: Target },
               { id: 'analytics', label: 'Analytics Dashboard', icon: BarChart3 },
               { id: 'directory', label: 'Skills Directory', icon: Users },
-              { id: 'projects', label: 'Launch a Project', icon: Briefcase },
+              { id: 'projects', label: 'Launch an Opportunity', icon: Briefcase },
               { id: 'admin', label: 'Admin', icon: Settings }
             ].map(tab => (
               <button
@@ -537,19 +544,21 @@ window.storage = {
                   </svg>
                 </div>
                 <h3 className="text-2xl font-bold text-slate-900 mb-2">Profile Submitted!</h3>
-                <p className="text-slate-600 mb-6">Thank you for submitting your skills profile. You can now browse available projects and express interest!</p>
+                <p className="text-slate-600 mb-6">Thank you for submitting your skills profile. You can now browse available opportunities and express interest!</p>
                 <div className="flex gap-3 justify-center mb-4">
                   <button
                     onClick={() => setActiveTab('opportunities')}
                     className="px-6 py-3 bg-gradient-to-r from-sky-600 to-sky-600 text-white rounded-lg hover:from-sky-700 hover:to-sky-700 font-semibold shadow-md"
                   >
-                    Browse Projects
+                    Browse Opportunities
                   </button>
                   <button
                     onClick={() => {
                       setSubmissionSuccess(false);
                       setSkillInputs([{ name: '', level: 'Intermediate', category: 'General' }]);
                       setGrowthAreasInput('');
+                      setWillingToMentor(false);
+                      setWillingToPresent(false);
                       setIsSubmitting(false);
                     }}
                     className="px-6 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50"
@@ -562,9 +571,9 @@ window.storage = {
                     <strong>🎯 Next Steps:</strong>
                   </p>
                   <ul className="text-blue-800 space-y-1 ml-4">
-                    <li>• Browse projects by clicking "Browse Projects" above</li>
-                    <li>• Filter projects by skills you want to use</li>
-                    <li>• Express interest in projects that excite you</li>
+                    <li>• Browse opportunities by clicking "Browse Opportunities" above</li>
+                    <li>• Filter opportunities by skills you want to use</li>
+                    <li>• Express interest in opportunities that excite you</li>
                     <li>• Project managers will review your profile and reach out</li>
                   </ul>
                 </div>
@@ -591,6 +600,8 @@ window.storage = {
                     team: formData.get('team'),
                     role: formData.get('role'),
                     availability: formData.get('availability'),
+                    willingToMentor,
+                    willingToPresent,
                     skills: validSkills,
                     growthAreas: parseGrowthAreas(growthAreasInput)
                   };
@@ -647,7 +658,7 @@ window.storage = {
                   </div>
                   
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">Availability for Short-term Projects *</label>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Availability for Short-term Opportunities *</label>
                     <select 
                       name="availability" 
                       required 
@@ -768,6 +779,41 @@ window.storage = {
                 </div>
 
                 <div className="border-t border-slate-200 pt-6">
+                  <h3 className="text-lg font-semibold text-slate-900 mb-1">Share Your Knowledge</h3>
+                  <p className="text-sm text-slate-600 mb-4">Let us know if you're open to sharing your knowledge with others.</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <label className={`flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${willingToMentor ? 'border-sky-500 bg-sky-50' : 'border-slate-200 bg-white hover:border-slate-300'}`}>
+                      <input
+                        type="checkbox"
+                        checked={willingToMentor}
+                        onChange={(e) => setWillingToMentor(e.target.checked)}
+                        className="mt-1 w-4 h-4 text-sky-600 rounded focus:ring-sky-500"
+                      />
+                      <div>
+                        <div className="font-semibold text-slate-900 flex items-center gap-2">
+                          🎓 Happy to Mentor
+                        </div>
+                        <div className="text-xs text-slate-600 mt-1">I'm willing to provide 1:1 guidance and support to colleagues looking to develop in my areas of expertise.</div>
+                      </div>
+                    </label>
+                    <label className={`flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${willingToPresent ? 'border-sky-500 bg-sky-50' : 'border-slate-200 bg-white hover:border-slate-300'}`}>
+                      <input
+                        type="checkbox"
+                        checked={willingToPresent}
+                        onChange={(e) => setWillingToPresent(e.target.checked)}
+                        className="mt-1 w-4 h-4 text-sky-600 rounded focus:ring-sky-500"
+                      />
+                      <div>
+                        <div className="font-semibold text-slate-900 flex items-center gap-2">
+                          🎤 Happy to Present
+                        </div>
+                        <div className="text-xs text-slate-600 mt-1">I'm willing to present on topics in my skillset — e.g. lunch &amp; learns, team sessions, or knowledge-sharing events.</div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="border-t border-slate-200 pt-6">
                   <button
                     type="submit"
                     disabled={isSubmitting}
@@ -819,8 +865,8 @@ window.storage = {
         {activeTab === 'opportunities' && (
           <div className="space-y-4 sm:space-y-6">
             <div className="text-center mb-6 sm:mb-8">
-              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Project Opportunities</h2>
-              <p className="text-sm sm:text-base text-slate-600">Browse and filter projects by the skills you want to use</p>
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Opportunities</h2>
+              <p className="text-sm sm:text-base text-slate-600">Browse and filter opportunities by the skills you want to use</p>
             </div>
 
             {/* Search and Filter */}
@@ -831,7 +877,7 @@ window.storage = {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                     <input
                       type="text"
-                      placeholder="Search projects or skills..."
+                      placeholder="Search opportunities or skills..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm sm:text-base"
@@ -899,7 +945,7 @@ window.storage = {
                 <>
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg sm:text-xl font-bold text-slate-900">
-                      {filteredProjects.length} Project{filteredProjects.length !== 1 ? 's' : ''} Available
+                      {filteredProjects.length} Opportunit{filteredProjects.length !== 1 ? 'ies' : 'y'} Available
                     </h3>
                   </div>
 
@@ -990,9 +1036,9 @@ window.storage = {
                       <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <Search className="w-8 h-8 text-slate-400" />
                       </div>
-                      <h3 className="text-lg sm:text-xl font-semibold text-slate-900 mb-2">No Projects Found</h3>
+                      <h3 className="text-lg sm:text-xl font-semibold text-slate-900 mb-2">No Opportunities Found</h3>
                       <p className="text-sm sm:text-base text-slate-600 mb-4">
-                        No projects match your current search criteria.
+                        No opportunities match your current search criteria.
                       </p>
                       <button
                         onClick={() => {
@@ -1015,24 +1061,24 @@ window.storage = {
                 <svg className="w-5 h-5 text-blue-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                 </svg>
-                How to Find the Right Project
+                How to Find the Right Opportunity
               </h3>
               <ul className="text-xs sm:text-sm text-slate-700 space-y-2">
                 <li className="flex items-start gap-2">
                   <span className="text-sky-600 font-bold flex-shrink-0">•</span>
-                  <span><strong>Search by skill:</strong> Click any skill tag above or type in the search box to filter projects</span>
+                  <span><strong>Search by skill:</strong> Click any skill tag above or type in the search box to filter opportunities</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-sky-600 font-bold flex-shrink-0">•</span>
-                  <span><strong>Browse by department:</strong> Use the department filter to see projects in specific teams</span>
+                  <span><strong>Browse by department:</strong> Use the department filter to see opportunities in specific teams</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-sky-600 font-bold flex-shrink-0">•</span>
-                  <span><strong>Express interest:</strong> Click "Express Interest" on projects that excite you - you don't need to have all the required skills</span>
+                  <span><strong>Express interest:</strong> Click "Express Interest" on opportunities that excite you - you don't need to have all the required skills</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-sky-600 font-bold flex-shrink-0">•</span>
-                  <span><strong>Learn more:</strong> Contact the project manager to understand more about the project scope and expectations</span>
+                  <span><strong>Learn more:</strong> Contact the project manager to understand more about the opportunity scope and expectations</span>
                 </li>
               </ul>
             </div>
@@ -1117,7 +1163,7 @@ window.storage = {
               </div>
               <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                 <div className="text-2xl sm:text-3xl font-bold text-slate-900">{projects.length}</div>
-                <div className="text-xs sm:text-sm text-slate-600">Open Projects</div>
+                <div className="text-xs sm:text-sm text-slate-600">Open Opportunities</div>
               </div>
             </div>
 
@@ -1267,6 +1313,28 @@ window.storage = {
                     ))}
                   </select>
                 </div>
+                <div>
+                  <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Filter by Engagement</div>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { value: 'all', label: 'All People' },
+                      { value: 'mentor', label: '🎓 Happy to Mentor' },
+                      { value: 'present', label: '🎤 Happy to Present' },
+                    ].map(opt => (
+                      <button
+                        key={opt.value}
+                        onClick={() => setSelectedEngagement(opt.value)}
+                        className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all ${
+                          selectedEngagement === opt.value
+                            ? 'bg-sky-600 text-white shadow-md'
+                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -1317,6 +1385,20 @@ window.storage = {
                       </div>
                     </div>
                   )}
+                  {(employee.willingToMentor || employee.willingToPresent) && (
+                    <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t border-slate-100">
+                      {employee.willingToMentor && (
+                        <span className="px-2.5 py-1 bg-violet-100 text-violet-700 rounded-full text-xs font-semibold">
+                          🎓 Mentor
+                        </span>
+                      )}
+                      {employee.willingToPresent && (
+                        <span className="px-2.5 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-semibold">
+                          🎤 Presenter
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -1327,13 +1409,13 @@ window.storage = {
         {activeTab === 'projects' && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-3xl font-bold text-slate-900">Project Matching</h2>
+              <h2 className="text-3xl font-bold text-slate-900">Opportunity Matching</h2>
               <button
                 onClick={() => setShowAddProject(true)}
                 className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-sky-600 to-sky-600 text-white rounded-lg hover:from-sky-700 hover:to-sky-700 transition-all shadow-md"
               >
                 <Plus className="w-4 h-4" />
-                New Project
+                New Opportunity
               </button>
             </div>
 
@@ -1411,7 +1493,7 @@ window.storage = {
               <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                 <div className="bg-white rounded-xl p-6 max-w-lg w-full">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-semibold">Add New Project</h3>
+                    <h3 className="text-xl font-semibold">Add New Opportunity</h3>
                     <button onClick={() => setShowAddProject(false)} className="text-slate-400 hover:text-slate-600">
                       <X className="w-5 h-5" />
                     </button>
@@ -1434,7 +1516,7 @@ window.storage = {
                   }}>
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Project Title</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Opportunity Title</label>
                         <input name="title" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
                       </div>
                       <div>
@@ -1442,8 +1524,8 @@ window.storage = {
                         <input name="manager" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" placeholder="Full name" />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Brief Project Description</label>
-                        <textarea name="description" required rows="3" className="w-full px-3 py-2 border border-slate-300 rounded-lg" placeholder="What is this project about and what will participants be doing?" />
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Brief Description</label>
+                        <textarea name="description" required rows="3" className="w-full px-3 py-2 border border-slate-300 rounded-lg" placeholder="What is this opportunity about and what will participants be doing?" />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-slate-700 mb-1">Business Unit</label>
@@ -1460,7 +1542,7 @@ window.storage = {
                     </div>
                     <div className="mt-6 flex gap-3">
                       <button type="submit" className="flex-1 px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700">
-                        Add Project
+                        Add Opportunity
                       </button>
                       <button type="button" onClick={() => setShowAddProject(false)} className="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50">
                         Cancel
@@ -1716,7 +1798,7 @@ window.storage = {
             <div className="bg-white rounded-xl p-6 max-w-lg w-full" onClick={(e) => e.stopPropagation()}>
               <h3 className="text-lg font-semibold text-slate-900 mb-3">An Outlook Message window will open</h3>
               <p className="text-sm text-slate-700 mb-5">
-                Submit your interest via Outlook. Thanks for your interest in this project! The responsible manager will review your profile and be in touch!
+                Submit your interest via Outlook. Thanks for your interest in this opportunity! The responsible manager will review your profile and be in touch!
               </p>
               <div className="flex justify-end">
                 <button
