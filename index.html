@@ -178,6 +178,8 @@ window.storage = {
     const Download = toIconComponent('Download');
     const ChevronDown = toIconComponent('ChevronDown');
     const ChevronRight = toIconComponent('ChevronRight');
+    const GraduationCap = toIconComponent('GraduationCap');
+    const BookOpen = toIconComponent('BookOpen');
   </script>
 
   <script type="text/babel">
@@ -207,6 +209,10 @@ window.storage = {
       const [growthAreasInput, setGrowthAreasInput] = useState('');
       const [willingToMentor, setWillingToMentor] = useState(false);
       const [willingToPresent, setWillingToPresent] = useState(false);
+      const [seekingMentor, setSeekingMentor] = useState(false);
+      const [mentorSearchQuery, setMentorSearchQuery] = useState('');
+      const [selectedGrowthArea, setSelectedGrowthArea] = useState('all');
+      const [mentorEmailTarget, setMentorEmailTarget] = useState(null);
       const [showLinkedInImport, setShowLinkedInImport] = useState(false);
       const [skillPickerSearch, setSkillPickerSearch] = useState('');
       const [skillPickerCategory, setSkillPickerCategory] = useState('All');
@@ -558,9 +564,18 @@ window.storage = {
       .sort((a, b) => b.gap - a.gap || b.demand - a.demand)
       .slice(0, 8);
 
+    // Mentor outreach metrics
+    const mentorOutreachCount = interests.filter(i => !i._deleted && i.type === 'mentor').length;
+    const seekingMentorCount = employees.filter(e => e.seekingMentor).length;
+    const mentorConversionRate = seekingMentorCount === 0 ? null
+      : Math.round((new Set(interests.filter(i => !i._deleted && i.type === 'mentor').map(i => i.mentorId)).size / mentorOutreachCount || 0) * 100);
+    // % of people seeking a mentor who have sent at least one outreach (proxy: outreach events vs seekers)
+    const seekerEngagementRate = seekingMentorCount === 0 ? null
+      : Math.min(100, Math.round((mentorOutreachCount / seekingMentorCount) * 100));
+
     return { totalProfiles, avgSkillsPerEmployee, mentorCount, presenterCount,
       mentorPct, presenterPct, totalOpps, oppsWithInterest, oppEngagementRate,
-      avgInterestPerOpp, skillGaps };
+      avgInterestPerOpp, skillGaps, mentorOutreachCount, seekingMentorCount, seekerEngagementRate };
   })();
 
   
@@ -657,28 +672,39 @@ window.storage = {
     await saveInterests([...interests, newInterest]);
     setShowEmailModal(false);
     setSelectedProjectForInterest(null);
+    setMentorEmailTarget(null);
     setShowInterestModal(true);
   };
 
   const handleSendInterestEmail = async () => {
-    if (!selectedProjectForInterest) return;
+    if (!selectedProjectForInterest && !mentorEmailTarget) return;
 
-    const recipient = selectedProjectForInterest?.contactEmail || 'onecleanco@cleancoqld.com.au';
+    const recipient = mentorEmailTarget?.contactEmail || selectedProjectForInterest?.contactEmail || 'onecleanco@cleancoqld.com.au';
     const mailtoLink = `mailto:${recipient}?subject=${encodeURIComponent(interestEmailSubject)}&body=${encodeURIComponent(interestEmailBody)}`;
 
     try {
       window.location.href = mailtoLink;
 
-      const newInterest = {
-        id: Date.now(),
-        projectId: selectedProjectForInterest.id,
-        projectTitle: selectedProjectForInterest.title,
-        createdAt: new Date().toISOString()
-      };
+      const newInterest = mentorEmailTarget
+        ? {
+            id: Date.now(),
+            type: 'mentor',
+            mentorId: mentorEmailTarget.id,
+            mentorName: mentorEmailTarget.name,
+            createdAt: new Date().toISOString()
+          }
+        : {
+            id: Date.now(),
+            type: 'opportunity',
+            projectId: selectedProjectForInterest.id,
+            projectTitle: selectedProjectForInterest.title,
+            createdAt: new Date().toISOString()
+          };
 
       await saveInterests([...interests, newInterest]);
       setShowEmailModal(false);
       setSelectedProjectForInterest(null);
+      setMentorEmailTarget(null);
       setShowInterestModal(true);
     } catch (error) {
       console.error('Failed to launch email client:', error);
@@ -2555,6 +2581,7 @@ window.storage = {
             {[
               { id: 'self-service', label: 'Submit Skills', icon: Users },
               { id: 'directory', label: 'Skills Directory', icon: Users },
+              { id: 'mentors', label: 'Find a Mentor', icon: GraduationCap },
               { id: 'opportunities', label: 'Browse Opportunities', icon: Target },
               { id: 'projects', label: 'Launch an Opportunity', icon: Briefcase },
               { id: 'analytics', label: 'Analytics Dashboard', icon: BarChart3 },
@@ -2587,7 +2614,7 @@ window.storage = {
           <div className="max-w-3xl mx-auto space-y-6">
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold text-slate-900 mb-2">OneCleanCo Skills Marketplace</h2>
-              <p className="text-slate-600">Tell us what you know and what you want to learn — we'll connect you with the right projects and learning opportunities</p>
+              <p className="text-slate-600">Own your growth. Share what you know, discover what you want to learn, and connect directly with the people who can help you get there.</p>
             </div>
 
             {submissionSuccess ? (
@@ -2613,6 +2640,7 @@ window.storage = {
                       setGrowthAreasInput('');
                       setWillingToMentor(false);
                       setWillingToPresent(false);
+          setSeekingMentor(false);
                       setJobTitleInput('');
                       setSuggestedSkills([]);
                       setShowSuggestionBanner(false);
@@ -2656,12 +2684,14 @@ window.storage = {
                   const newEmployee = {
                     id: employees.length ? Math.max(...employees.map(emp => emp.id || 0)) + 1 : 1,
                     name: formData.get('name'),
+                    contactEmail: formData.get('contactEmail'),
                     department: formData.get('department'),
                     team: formData.get('team'),
                     role: formData.get('role'),
                     availability: formData.get('availability'),
                     willingToMentor,
                     willingToPresent,
+                    seekingMentor,
                     skills: validSkills,
                     growthAreas: parseGrowthAreas(growthAreasInput)
                   };
@@ -2684,6 +2714,17 @@ window.storage = {
                       required 
                       className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
                       placeholder="John Smith"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Work Email *</label>
+                    <input
+                      name="contactEmail"
+                      type="email"
+                      required
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+                      placeholder="firstname.lastname@cleancoqld.com.au"
                     />
                   </div>
                   
@@ -3017,6 +3058,23 @@ window.storage = {
                     className="w-full mt-3 px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
                     placeholder="Data Engineering Energy Trading Asset Management Finance Operations"
                   />
+                </div>
+
+                <div className="border-t border-slate-200 pt-6">
+                  <h3 className="text-lg font-semibold text-slate-900 mb-1">Looking for a mentor?</h3>
+                  <p className="text-sm text-slate-600 mb-3">If you've listed growth areas above and would like to be matched with a mentor who has those skills, tick below.</p>
+                  <label className={`flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${seekingMentor ? 'border-violet-500 bg-violet-50' : 'border-slate-200 bg-white hover:border-slate-300'}`}>
+                    <input
+                      type="checkbox"
+                      checked={seekingMentor}
+                      onChange={(e) => setSeekingMentor(e.target.checked)}
+                      className="mt-1 w-4 h-4 text-violet-600 rounded focus:ring-violet-500"
+                    />
+                    <div>
+                      <div className="font-semibold text-slate-900">🎯 Find me a mentor</div>
+                      <div className="text-xs text-slate-600 mt-1">I'd like to be connected with someone who can help me develop in the areas I've listed above.</div>
+                    </div>
+                  </label>
                 </div>
 
                 <div className="border-t border-slate-200 pt-6">
@@ -3434,6 +3492,45 @@ window.storage = {
                     {platformMetrics.totalProfiles === 0 ? 'No profiles yet' : platformMetrics.presenterPct >= 10 ? '✓ Good presenter pool' : 'Target: 10%+'}
                   </div>
                 </div>
+
+                {/* Mentor outreach */}
+                <div className={`rounded-xl border p-4 col-span-2 lg:col-span-3 ${platformMetrics.mentorOutreachCount > 0 ? 'border-violet-200 bg-violet-50' : 'border-slate-200'}`}>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-baseline gap-3">
+                        <div className="text-2xl font-bold text-slate-900">{platformMetrics.mentorOutreachCount}</div>
+                        {platformMetrics.seekerEngagementRate !== null && (
+                          <div className={`text-sm font-semibold ${platformMetrics.seekerEngagementRate >= 50 ? 'text-violet-600' : 'text-slate-400'}`}>
+                            {platformMetrics.seekerEngagementRate}% of seekers have reached out
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-xs font-semibold text-slate-600 mt-0.5">🎯 Mentor outreach events</div>
+                      <div className={`text-xs mt-1 ${platformMetrics.mentorOutreachCount > 0 ? 'text-violet-600' : 'text-slate-400'}`}>
+                        {platformMetrics.seekingMentorCount === 0
+                          ? 'No one seeking a mentor yet'
+                          : platformMetrics.mentorOutreachCount === 0
+                            ? `${platformMetrics.seekingMentorCount} seeking — target: first outreach`
+                            : platformMetrics.seekerEngagementRate >= 50
+                              ? `✓ Good — ${platformMetrics.seekingMentorCount} seeking, target 50%+ engaged`
+                              : `${platformMetrics.seekingMentorCount} seeking — target: 50%+ have reached out`}
+                      </div>
+                    </div>
+                    {platformMetrics.seekingMentorCount > 0 && (
+                      <div className="w-full sm:w-40">
+                        <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-violet-400 transition-all"
+                            style={{ width: `${Math.min(100, platformMetrics.seekerEngagementRate || 0)}%` }}
+                          />
+                        </div>
+                        <div className="text-xs text-slate-400 mt-1 text-right">
+                          {platformMetrics.seekerEngagementRate ?? 0}% engaged
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
 
             </div>
@@ -3611,6 +3708,196 @@ window.storage = {
             )}
           </div>
         )}
+
+
+        {/* Find a Mentor */}
+        {activeTab === 'mentors' && (() => {
+          // Build the mentor match engine
+          const MENTOR_LEVELS = ['Advanced', 'Expert'];
+
+          // All growth areas across all employees who are seeking a mentor — used for the "browse by skill" filter
+          const allGrowthAreas = [...new Set(
+            employees
+              .filter(e => e.seekingMentor && (e.growthAreas || []).length > 0)
+              .flatMap(e => e.growthAreas)
+              .map(a => a.trim())
+              .filter(Boolean)
+          )].sort();
+
+          // For each growth area, find matching mentors
+          const getMentorsForArea = (area) => {
+            const areaLower = area.toLowerCase();
+            return employees
+              .filter(emp => emp.willingToMentor && !emp._deleted)
+              .map(emp => {
+                const matchedSkills = (emp.skills || []).filter(s =>
+                  MENTOR_LEVELS.includes(s.level) &&
+                  s.name.toLowerCase().includes(areaLower)
+                );
+                // also count total advanced/expert skills as a secondary rank signal
+                const totalExpertise = (emp.skills || []).filter(s => MENTOR_LEVELS.includes(s.level)).length;
+                return { emp, matchedSkills, totalExpertise };
+              })
+              .filter(m => m.matchedSkills.length > 0)
+              .sort((a, b) => {
+                // Expert > Advanced, then total expertise
+                const scoreA = a.matchedSkills.reduce((s, sk) => s + (sk.level === 'Expert' ? 2 : 1), 0);
+                const scoreB = b.matchedSkills.reduce((s, sk) => s + (sk.level === 'Expert' ? 2 : 1), 0);
+                return scoreB - scoreA || b.totalExpertise - a.totalExpertise;
+              })
+              .slice(0, 5);
+          };
+
+          // Filtered growth areas based on search or selected area tab
+          const displayAreas = selectedGrowthArea === 'all'
+            ? (mentorSearchQuery
+                ? allGrowthAreas.filter(a => a.toLowerCase().includes(mentorSearchQuery.toLowerCase()))
+                : allGrowthAreas)
+            : [selectedGrowthArea];
+
+          const totalSeeking = employees.filter(e => e.seekingMentor).length;
+          const totalMentors = employees.filter(e => e.willingToMentor).length;
+
+          return (
+            <div className="space-y-4 sm:space-y-6">
+              <div className="text-center mb-6 sm:mb-8">
+                <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Find a Mentor</h2>
+                <p className="text-sm sm:text-base text-slate-600">Connecting people who want to grow with people who can help them get there.</p>
+              </div>
+
+              {/* Stats bar */}
+              <div className="grid grid-cols-3 gap-3">
+                <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
+                  <div className="text-2xl font-bold text-violet-600">{totalMentors}</div>
+                  <div className="text-xs text-slate-500 mt-0.5">Available mentors</div>
+                </div>
+                <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
+                  <div className="text-2xl font-bold text-sky-600">{totalSeeking}</div>
+                  <div className="text-xs text-slate-500 mt-0.5">Seeking mentorship</div>
+                </div>
+                <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
+                  <div className="text-2xl font-bold text-emerald-600">{allGrowthAreas.length}</div>
+                  <div className="text-xs text-slate-500 mt-0.5">Skills being sought</div>
+                </div>
+              </div>
+
+              {allGrowthAreas.length === 0 ? (
+                <div className="bg-white rounded-xl p-10 border border-slate-200 text-center">
+                  <div className="text-4xl mb-3">🎯</div>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-2">No mentor matches yet</h3>
+                  <p className="text-sm text-slate-600 max-w-md mx-auto">
+                    Matches appear here when employees submit a profile with growth areas and tick "Find me a mentor".
+                    Mentors need to have submitted a profile and ticked "Happy to Mentor".
+                  </p>
+                </div>
+              ) : (
+                <>
+                  {/* Search + filter */}
+                  <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm space-y-3">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <input
+                        type="text"
+                        placeholder="Search by skill or growth area..."
+                        value={mentorSearchQuery}
+                        onChange={(e) => { setMentorSearchQuery(e.target.value); setSelectedGrowthArea('all'); }}
+                        className="w-full pl-9 pr-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm"
+                      />
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        onClick={() => { setSelectedGrowthArea('all'); setMentorSearchQuery(''); }}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${selectedGrowthArea === 'all' && !mentorSearchQuery ? 'bg-violet-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+                      >
+                        All skills
+                      </button>
+                      {allGrowthAreas.map(area => (
+                        <button
+                          key={area}
+                          onClick={() => { setSelectedGrowthArea(area); setMentorSearchQuery(''); }}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${selectedGrowthArea === area ? 'bg-violet-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+                        >
+                          {area}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Match results */}
+                  <div className="space-y-4">
+                    {displayAreas.map(area => {
+                      const matches = getMentorsForArea(area);
+                      return (
+                        <div key={area} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                          <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-bold text-slate-900">{area}</span>
+                              <span className="text-xs bg-violet-100 text-violet-700 font-semibold px-2 py-0.5 rounded-full">
+                                {matches.length} mentor{matches.length !== 1 ? 's' : ''}
+                              </span>
+                            </div>
+                            <span className="text-xs text-slate-400">
+                              {employees.filter(e => e.seekingMentor && (e.growthAreas||[]).some(g => g.toLowerCase().includes(area.toLowerCase()))).length} seeking this
+                            </span>
+                          </div>
+
+                          {matches.length === 0 ? (
+                            <div className="px-5 py-6 text-sm text-slate-500 text-center">
+                              No mentors have registered Advanced or Expert skills in this area yet.
+                            </div>
+                          ) : (
+                            <div className="divide-y divide-slate-100">
+                              {matches.map(({ emp, matchedSkills, totalExpertise }) => (
+                                <div key={emp.id} className="px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-4">
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <span className="font-semibold text-slate-900">{emp.name}</span>
+                                      {matchedSkills.some(s => s.level === 'Expert') && (
+                                        <span className="text-xs bg-amber-100 text-amber-700 font-semibold px-2 py-0.5 rounded-full">Expert</span>
+                                      )}
+                                      {!matchedSkills.some(s => s.level === 'Expert') && (
+                                        <span className="text-xs bg-sky-100 text-sky-700 font-semibold px-2 py-0.5 rounded-full">Advanced</span>
+                                      )}
+                                    </div>
+                                    <div className="text-xs text-slate-500 mt-0.5">{emp.role} · {emp.department}</div>
+                                    <div className="flex flex-wrap gap-1.5 mt-2">
+                                      {matchedSkills.map(s => (
+                                        <span key={s.name} className="text-xs bg-violet-50 text-violet-700 border border-violet-200 px-2 py-0.5 rounded-full">{s.name}</span>
+                                      ))}
+                                      {totalExpertise > matchedSkills.length && (
+                                        <span className="text-xs text-slate-400">+{totalExpertise - matchedSkills.length} other advanced skills</span>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <button
+                                    onClick={() => {
+                                      setMentorEmailTarget(emp);
+                                      setInterestEmailSubject(`Mentoring request — ${area}`);
+                                      setInterestEmailBody(`Hi ${emp.name},\n\nI came across your profile on the OneCleanCo Skills Marketplace and noticed you have expertise in ${area}.\n\nI'm keen to develop in this area and would love to connect for a short conversation to explore whether you'd be open to mentoring me.\n\nWould you be available for a 30-minute chat?\n\nThanks,`);
+                                      setShowEmailModal(true);
+                                    }}
+                                    className="flex-shrink-0 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold rounded-lg transition-colors"
+                                  >
+                                    Reach out
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                    {displayAreas.length === 0 && mentorSearchQuery && (
+                      <div className="bg-white rounded-xl p-8 border border-slate-200 text-center text-sm text-slate-500">
+                        No growth areas match "{mentorSearchQuery}".
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          );
+        })()}
 
         {/* Skills Directory */}
         {activeTab === 'directory' && (
@@ -3908,9 +4195,9 @@ window.storage = {
         {showEmailModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowEmailModal(false)}>
             <div className="bg-white rounded-xl p-6 max-w-lg w-full" onClick={(e) => e.stopPropagation()}>
-              <h3 className="text-lg font-semibold text-slate-900 mb-1">Express Interest</h3>
+              <h3 className="text-lg font-semibold text-slate-900 mb-1">{mentorEmailTarget ? "Reach out to a mentor" : "Express Interest"}</h3>
               <p className="text-sm text-slate-600 mb-4">
-                Send your expression of interest email for <strong>{selectedProjectForInterest?.title}</strong>.
+                {mentorEmailTarget ? <>Sending a mentoring request to <strong>{mentorEmailTarget.name}</strong>.</> : <>Send your expression of interest email for <strong>{selectedProjectForInterest?.title}</strong>.</>}
               </p>
 
               <div className="space-y-3">
@@ -3918,7 +4205,7 @@ window.storage = {
                   <label className="block text-sm font-medium text-slate-700 mb-1">To</label>
                   <input
                     type="text"
-                    value={selectedProjectForInterest?.contactEmail || 'onecleanco@cleancoqld.com.au'}
+                    value={mentorEmailTarget ? mentorEmailTarget.name : (selectedProjectForInterest?.contactEmail || 'onecleanco@cleancoqld.com.au')}
                     readOnly
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-slate-50 text-slate-700"
                   />
@@ -3948,6 +4235,7 @@ window.storage = {
                   onClick={() => {
                     setShowEmailModal(false);
                     setSelectedProjectForInterest(null);
+                    setMentorEmailTarget(null);
                   }}
                   className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50"
                 >
