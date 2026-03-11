@@ -207,7 +207,195 @@ window.storage = {
       const [growthAreasInput, setGrowthAreasInput] = useState('');
       const [willingToMentor, setWillingToMentor] = useState(false);
       const [willingToPresent, setWillingToPresent] = useState(false);
-      const [interests, setInterests] = useState([]);
+      const [showLinkedInImport, setShowLinkedInImport] = useState(false);
+      const [skillPickerSearch, setSkillPickerSearch] = useState('');
+      const [skillPickerCategory, setSkillPickerCategory] = useState('All');
+      const [jobTitleInput, setJobTitleInput] = useState('');
+      const [suggestedSkills, setSuggestedSkills] = useState([]);
+      const [showSuggestionBanner, setShowSuggestionBanner] = useState(false);
+      const [titleAutocomplete, setTitleAutocomplete] = useState([]);
+      const [showTitleDropdown, setShowTitleDropdown] = useState(false);
+      const [titleDropdownIndex, setTitleDropdownIndex] = useState(-1);
+
+      const HISTORICAL_TITLES = ["Account Manager - Retail", "Accountant", "Analytics Specialist", "Applications Specialist", "Applications Specialist - Corporate", "Asset Specialist", "Assistant Company Secretary", "BESS Superintendent", "Board Member", "Business Analyst", "Business Architect", "Business Improvement Manager", "Carbon Specialist", "Category Lead", "Category Lead - ICT", "Category Lead - Major Projects", "Category Specialist", "Change Analyst", "Change Manager", "Chief Executive Officer", "Cloud Data Engineer", "Cloud ML Engineer", "Cloud Systems Engineer", "Commercial Advisor", "Commercial Manager", "Commercial Manager - Offtakes Origination", "Commercial Manager - PPA Implementation", "Commercial Manager - PPAs", "Commercial Manager S&D", "Commercial Officer", "Communications & Engagement Officer", "Communications Officer", "Communications and Media Officer", "Community Engagement & Partnerships Officer", "Community Performance Manager", "Community Performance Officer", "Community Performance Specialist", "Compliance Advisor", "Concept Study Manager", "Construction Project Manager", "Contract Administrator", "Contracts Lead - Major Projects", "Contracts and Commercial Support Analyst", "Control Systems Engineer", "Control Systems Technician", "Corporate Applications Advisor", "Corporate Communications Specialist", "Corporate Finance Analyst", "Corporate Finance Manager", "Corporate First Nations Specialist", "Customer & Energy Markets Program Coordinator", "Customer & Retail Platform Lead", "Cyber Security Analyst", "Cyber Security Architect", "Cyber Security Program Manager", "D&T AO Program Manager", "D&T Business Analyst", "D&T Change Analyst", "D&T Commercial Lead", "D&T Portfolio Delivery Manager", "D&T Project Manager", "Data & Analytics Lead", "Data Analyst", "Development Commercial Advisor", "Development Director", "Digital & Technology Change Lead", "Director, Retail", "Diversity, Equity, Inclusion & Belonging Specialist", "Domain Architect", "Domain Architect - Asset Operations", "EPMO Analyst", "EPMO Coordinator", "Electrical / Instrumentation Apprentice", "Electrical Apprentice", "Electrical Engineer", "Electrical Engineer RPEQ", "Electrical Technician", "Electrical Tradesperson", "Electrician", "Employee Experience Manager", "Employee Relations Manager", "Employee Relations Partner", "Engagement & Planning Specialist", "Engineering Lead (Reliability)", "Engineering Manager - Development", "Engineering and Technical Services Manager", "Engineering and Technical Services Superintendent", "Enterprise Applications Lead", "Enterprise Information & Analytics Manager", "Enterprise Risk Principal Advisor", "Environmental Advisor", "Environmental Manager", "Environmental Specialist", "Executive Assistant", "Executive General Manager - Asset Operations", "Executive General Manager - Development & Sustainability", "Finance Analyst - Development", "Finance Business Partner", "Finance Officer - Accounts Payable", "Finance and Tax Accountant", "Financial Accountant", "Financial Accounting Specialist", "Financial Analyst", "Financial Control Manager", "First Nations Partnership Specialist", "Forward Market Manager", "Forward Market Trader", "Full Stack Developer", "General Manager - Reputation", "General Manager - Strategy & Development", "Governance & Vendor Management Lead", "Government Relations Manager", "Grid Connection Manager", "Grounds Maintenance Officer", "HSE Advisor", "Health & Safety Advisor", "Health & Safety Manager", "Health & Safety Specialist", "ICT Business Analyst", "ICT Business Partner", "ICT Category Lead", "ICT Cyber Project Manager", "ICT Development Manager", "ICT Operations Manager", "ICT Program Coordinator", "ICT Project Delivery Manager", "ICT Project Management Office Lead", "ICT Project Manager", "ICT Risk and Security Manager", "ICT SAP Business Analyst", "ICT SAP Project Manager", "ICT Service Delivery Coordinator", "ICT Service Delivery Lead", "ICT Services Manager", "Industrial Relations Specialist", "Information Management Specialist", "Information Security Manager", "Infrastructure Lead", "Insurance Specialist", "Internal Audit and Compliance Manager", "Iteration Manager", "Lead Electrical and Controls Engineer", "Lead Solution Architect", "Legal & Governance Manager", "Legal Advisor", "Legal Counsel", "Legal Specialist - Commercial/Property", "Legal Specialist - Gas and Renewables", "Maintainer Operator", "Maintenance Administration Officer/Planner", "Maintenance Management Officer", "Maintenance Reliability Engineer", "Maintenance and Site Services Superintendent", "Management Accountant", "Management Accounting Specialist", "Mechanical Apprentice", "Mechanical Engineer", "Mechanical Engineer (Operations)", "Mechanical Fitter", "Mechanical Fitter Apprentice", "Mechanical Technician", "Mechanical Tradesperson", "Modelling & Analytics Manager", "Modelling & Analytics Specialist", "Modelling Analyst - Portfolio Design", "Modelling Analyst - Renewable Portfolio", "Modelling Specialist - Renewable Energy", "New Venture Manager", "Operations Improvement Lead", "Operator Maintainer", "Organisational Capability Coordinator", "Organisational Capability Manager", "Organisational Change Manager", "Organisational Effectiveness Specialist", "Origination Manager (Development)", "Outage Manager", "P&C Insights Advisor", "P&C Operations Team Lead", "PMO Lead", "Payroll Lead", "Payroll Officer", "People & Culture Advisor", "People & Culture Advisor - Employee Relations", "People & Culture Business Partner", "People & Culture Coordinator", "People & Culture Services Manager", "People and Culture Coordinator", "Physical Energy Manager", "Physical Energy Trader", "Plant Officer", "Platforms Lead", "Portfolio Analyst", "Portfolio Asset Manager", "Portfolio Definition Lead", "Portfolio and Trading Strategy Advisor", "Principal Development Manager", "Principal Trader - Electricity", "Procurement Advisor", "Procurement Officer", "Procurement Specialist", "Product Manager - Energy Solutions", "Product, Partnership, and Innovation Manager", "Production Superintendent", "Program Manager", "Project Architect - Data Architecture", "Project Communications Officer", "Project Controller (Outage Planning)", "Project Controls & Planning Manager", "Project Coordinator", "Project Delivery Manager", "Project Engineer", "Project Engineer (Electrical)", "Project Engineer - Civil", "Project Engineer - Grid", "Project Manager", "Project Manager - Development", "Project Support Officer", "Property Specialist", "Receptionist", "Records Coordinator", "Recruitment Advisor", "Regulatory and Policy Advisor", "Remuneration Advisor", "Remuneration Analyst", "Retail Data Analyst", "Retail Market Systems and Analytics Manager", "Retail Operations Officer", "Risk & Resilience Advisor", "Risk & Resilience Manager", "Risk & Resilience Specialist", "Risk Advisor", "SAP Reporting Specialist", "SAP Solution Architect", "Safe Work & Electrical Safety Specialist", "Security Analyst", "Security Engineer", "Senior Compliance Officer", "Senior Construction Project Manager", "Senior Electrical Tradesperson", "Senior Legal Counsel", "Senior Policy and Regulatory Advisor", "Senior Process Safety Specialist", "Service Management Lead", "Service Now System Administrator", "Settlements Officer", "Site Administration Officer", "Site Manager", "Solution Architect", "Solutions Architect - Energy Trading", "Specialist, Communications and Media", "Spot Market Trader", "Station Support Officer", "Strategic Sourcing and Procurement Manager", "Strategy Analyst", "Strategy, Engagement & Architecture Manager", "Sustainability Advisor", "Sustainability Manager (ESG)", "Systems Specialist", "Technical Business Analyst", "Technical Lead", "Technical Officer - Electrical", "Technology Strategy, Engagement & Architecture Manager", "Trading Risk Analyst", "Trading Risk Specialist", "Warehousing & Procurement Officer", "Warehousing and Procurement Advisor", "Workplace Relations Manager"];
+
+            const SKILL_LIBRARY = {
+        'Energy & Markets': [
+          'Energy Trading', 'Electricity Markets', 'NEM (National Energy Market)', 'Wholesale Market', 'Retail Energy',
+          'Spot Market Trading', 'Physical Energy Trading', 'Forward Market Trading', 'Derivatives', 'Hedging',
+          'Market Risk', 'Load Forecasting', 'Dispatch Optimisation', 'Ancillary Services', 'Frequency Control',
+          'Energy Procurement', 'Power Purchase Agreements', 'Offtake Agreements', 'Market Settlements',
+          'Financial Reconciliation', 'Carbon Accounting', 'Emissions Reporting', 'Carbon Credits',
+          'Energy Transition', 'Demand Response', 'Energy Storage', 'Grid Stability', 'Renewable Energy',
+          'Energy Policy', 'Energy Modelling', 'Portfolio Optimisation', 'Market Bidding Strategy',
+          'Hydro Operations', 'Battery Storage (BESS)', 'Solar Generation', 'Wind Generation',
+          'Gas Operations', 'Energy Pricing', 'Revenue Forecasting', 'NEM Rules & Compliance'
+        ],
+        'Engineering': [
+          'Electrical Engineering', 'Mechanical Engineering', 'Civil Engineering', 'Process Engineering',
+          'Chemical Engineering', 'Structural Engineering', 'Environmental Engineering', 'Safety Engineering',
+          'Control Systems', 'Instrumentation', 'PLC Programming', 'HV/LV Systems', 'Switchgear',
+          'Transformer Maintenance', 'Protection & Relay', 'Fault Analysis', 'Power Systems Analysis',
+          'Condition Monitoring', 'Reliability Engineering', 'Maintenance Planning', 'Predictive Maintenance',
+          'Root Cause Analysis', 'Capital Works', 'Asset Lifecycle Management', 'Commissioning',
+          'AutoCAD', 'Revit', 'SAP PM', 'CMMS', 'Technical Writing', 'Engineering Standards',
+          'Welding & Fabrication', 'Hydraulics & Pneumatics', 'Turbine Maintenance', 'Generator Systems',
+          'High Voltage Work', 'Permits to Work', 'EPCM', 'Value Engineering',
+          'Engineering Management', 'Technical Documentation', 'Feasibility Studies', 'RPEQ'
+        ],
+        'Asset & Plant Operations': [
+          'Plant Operations', 'Asset Management', 'SCADA Systems', 'DCS (Distributed Control Systems)',
+          'Outage Management', 'Outage Planning', 'Shutdown Management', 'Preventive Maintenance',
+          'Corrective Maintenance', 'Breakdown Maintenance', 'Maintenance Strategy',
+          'Maintenance Administration', 'Work Order Management', 'Inventory Management',
+          'Spare Parts Management', 'Contractor Management', 'Hydro Generation Operations',
+          'Thermal Plant Operations', 'Pumped Hydro', 'Site Management', 'Field Operations',
+          'Operator Training', 'Operating Procedures', 'Emergency Response', 'Incident Response',
+          'Plant Performance', 'Production Reporting', 'Operations Management',
+          'Continuous Improvement', 'Lean Operations', 'Operational Readiness'
+        ],
+        'Project & Program Delivery': [
+          'Project Management', 'Program Management', 'Portfolio Management', 'PMO',
+          'Project Governance', 'Benefits Realisation', 'Scheduling (MS Project)', 'Primavera P6',
+          'Earned Value Management', 'Project Controls', 'Cost Management', 'Budget Management',
+          'Risk & Issues Management', 'Lessons Learned', 'Project Reporting', 'Executive Reporting',
+          'Change Control', 'Scope Management', 'Quality Management', 'Agile / Scrum',
+          'SAFe (Scaled Agile)', 'Waterfall Delivery', 'Hybrid Delivery', 'Iteration Management',
+          'Construction Management', 'EPCM Delivery', 'Brownfield Projects', 'Greenfield Projects',
+          'Capital Projects', 'Infrastructure Projects', 'Contract Administration', 'Contract Negotiation',
+          'Contract Law', 'Procurement (Projects)', 'Tender Management', 'Quantity Surveying',
+          'Project Communications', 'Stakeholder Management', 'Development Management',
+          'Concept Studies', 'Feasibility Studies', 'Business Case Development', 'Gateway Reviews'
+        ],
+        'Commercial & Finance': [
+          'Financial Modelling', 'Corporate Finance', 'Financial Analysis', 'Financial Accounting',
+          'Management Accounting', 'Cost Accounting', 'Financial Reporting', 'Regulatory Reporting',
+          'Financial Planning & Analysis (FP&A)', 'Budgeting & Forecasting', 'Budget Management',
+          'Treasury', 'Cash Flow Management', 'Tax Compliance', 'Tax Advisory', 'Transfer Pricing',
+          'Accounts Payable', 'Accounts Receivable', 'Payroll Management', 'Payroll Compliance',
+          'Insurance Management', 'Cost Benefit Analysis', 'Investment Analysis', 'Valuation',
+          'Capital Allocation', 'Commercial Management', 'Commercial Negotiation', 'Pricing Strategy',
+          'Revenue Management', 'Margin Analysis', 'Credit Risk', 'Derivatives', 'Hedging',
+          'SAP FICO', 'Oracle Financials', 'Financial Controls', 'Internal Controls',
+          'Procurement', 'Strategic Sourcing', 'Category Management', 'Supplier Management',
+          'Vendor Evaluation', 'Contract Administration', 'Accounts Reconciliation',
+          'Business Partnering', 'Financial Due Diligence', 'M&A Support'
+        ],
+        'Strategy & Analytics': [
+          'Strategic Planning', 'Scenario Planning', 'Business Strategy', 'Corporate Strategy',
+          'Market Analysis', 'Market Research', 'Competitive Intelligence', 'Benchmarking',
+          'Business Analysis', 'Requirements Management', 'Process Mapping', 'Process Improvement',
+          'Business Case Development', 'Benefits Realisation', 'Innovation Management',
+          'New Ventures', 'Business Development', 'Origination', 'Partnerships',
+          'Data Analysis', 'Data Visualisation', 'Data Modelling', 'Statistical Analysis',
+          'Quantitative Analysis', 'Excel (Advanced)', 'Power BI', 'Tableau', 'Qlik',
+          'SQL', 'Python', 'R', 'MATLAB', 'DAX', 'Power Query',
+          'Business Intelligence', 'Reporting Frameworks', 'KPI Development', 'Performance Reporting',
+          'Forecasting', 'Predictive Analytics', 'Machine Learning', 'Data Science',
+          'Energy Modelling', 'Portfolio Modelling', 'Financial Modelling (Strategy)',
+          'Policy Analysis', 'Regulatory Affairs', 'Stakeholder Mapping', 'Enterprise Architecture',
+          'Business Architecture', 'Operating Model Design', 'Organisational Design'
+        ],
+        'Technology & Digital': [
+          'IT Service Management (ITSM)', 'IT Operations', 'Service Delivery', 'IT Support',
+          'ITIL', 'ServiceNow', 'Jira', 'Confluence', 'DevOps', 'CI/CD',
+          'Agile Delivery', 'Software Development', 'JavaScript', 'React', 'Python',
+          'API Development', 'API Integration', 'Microservices', 'System Integration',
+          'Solution Architecture', 'Enterprise Architecture', 'Cloud (AWS)', 'Cloud (Azure)',
+          'Cloud (GCP)', 'Cloud Security', 'Infrastructure as Code', 'Terraform',
+          'Kubernetes', 'Docker', 'Linux Administration', 'Network Administration',
+          'SAP', 'SAP S/4HANA', 'SAP FICO', 'SAP PM', 'SAP HCM', 'SAP BW',
+          'ERP Systems', 'CRM Systems', 'Salesforce', 'SharePoint', 'Power Platform',
+          'Cybersecurity', 'Security Architecture', 'Penetration Testing', 'Threat Detection',
+          'SIEM', 'Identity & Access Management', 'GRC (Governance, Risk & Compliance)',
+          'Data Engineering', 'ETL / Data Pipelines', 'Data Warehouse', 'Data Governance',
+          'Big Data', 'MLOps', 'AI / Machine Learning', 'Natural Language Processing',
+          'Digital Transformation', 'Technology Strategy', 'IT Vendor Management',
+          'IT Procurement', 'Software Licensing', 'Business Continuity (IT)',
+          'IT Risk Management', 'Database Administration', 'GIS / Mapping', 'OT/ICS Security'
+        ],
+        'Health, Safety & Environment': [
+          'Safety (WHS)', 'Safety Management Systems', 'Safety Engineering', 'Process Safety',
+          'Risk Assessment', 'Hazard Identification (HAZID)', 'Hazard Analysis (HAZOP)',
+          'Bow-Tie Analysis', 'Safety Case Management', 'Permits to Work',
+          'Incident Investigation', 'Root Cause Analysis (Safety)', 'Near Miss Reporting',
+          'Emergency Management', 'Emergency Response Planning', 'Crisis Management',
+          'Site Safety Auditing', 'Safety Inspections', 'Safety Training',
+          'Electrical Safety', 'High Voltage Safety', 'Confined Space', 'Working at Heights',
+          'Environmental Management', 'Environmental Impact Assessment', 'Environmental Approvals',
+          'Environmental Monitoring', 'Water Management', 'Waste Management',
+          'Biodiversity & Ecology', 'Flora & Fauna', 'Noise & Vibration',
+          'Contaminated Land', 'Remediation', 'Environmental Compliance',
+          'Rehabilitation Planning', 'Sustainability', 'ESG Reporting', 'ESG Strategy',
+          'Carbon Accounting', 'Scope 1/2/3 Emissions', 'Net Zero Planning',
+          'Sustainability Reporting (GRI)', 'Carbon Markets', 'Climate Risk'
+        ],
+        'Legal, Risk & Governance': [
+          'Legal Advice', 'Corporate Law', 'Commercial Law', 'Contract Law', 'Energy Law',
+          'Property Law', 'Construction Law', 'Employment Law', 'Regulatory Law',
+          'Litigation Support', 'Dispute Resolution', 'Mediation', 'Arbitration',
+          'Legal Research', 'Legal Drafting', 'Due Diligence', 'Mergers & Acquisitions',
+          'Corporate Governance', 'Company Secretarial', 'Board Reporting', 'Board Advisory',
+          'Compliance Management', 'Regulatory Compliance', 'Internal Audit', 'External Audit',
+          'Risk Management', 'Enterprise Risk', 'Operational Risk', 'IT Risk',
+          'Risk Frameworks (ISO 31000)', 'Risk Assessment', 'Risk Reporting',
+          'Business Continuity', 'Disaster Recovery', 'Resilience Planning',
+          'Insurance Management', 'Claims Management', 'Policy Development',
+          'Government Relations', 'Policy Analysis', 'Regulatory Affairs',
+          'Privacy & Data Protection', 'GDPR Compliance', 'Information Security Policy',
+          'Procurement Law', 'Vendor Governance', 'Third Party Risk Management'
+        ],
+        'People & Culture': [
+          'HR Strategy', 'HR Operations', 'HR Business Partnering', 'Workforce Planning',
+          'Talent Acquisition', 'Recruitment', 'Employer Branding', 'Onboarding',
+          'Talent Management', 'Talent Development', 'Succession Planning', 'Career Frameworks',
+          'Learning & Development', 'Training Design', 'Training Delivery', 'Coaching',
+          'Mentoring', 'Leadership Development', 'Organisational Capability',
+          'Organisational Development', 'Organisational Effectiveness', 'Culture & Engagement',
+          'Employee Experience', 'Employee Listening', 'Pulse Surveys', 'Engagement Surveys',
+          'Performance Management', 'Performance Frameworks', 'Remuneration & Benefits',
+          'Job Evaluation', 'Benchmarking (Remuneration)', 'Total Reward Strategy',
+          'Employee Relations', 'Industrial Relations', 'Workplace Relations',
+          'Enterprise Bargaining', 'Award Interpretation', 'Fair Work Act',
+          'Diversity & Inclusion', 'Gender Equity', 'First Nations Engagement',
+          'Accessibility & Disability', 'DEIB Strategy', 'Wellbeing Programs',
+          'Change Management', 'Organisational Change', 'HRIS', 'SuccessFactors',
+          'Workday', 'Payroll Systems', 'P&C Analytics', 'Workforce Analytics'
+        ],
+        'Communications & Stakeholder': [
+          'Internal Communications', 'External Communications', 'Media Relations',
+          'Media Strategy', 'Crisis Communications', 'Issues Management',
+          'Corporate Affairs', 'Government Relations', 'Regulatory Engagement',
+          'Ministerial Briefings', 'Policy Submissions', 'Political Risk',
+          'Community Engagement', 'Community Development', 'Social Performance',
+          'Social Impact Assessment', 'Community Consultation', 'Grievance Management',
+          'First Nations Partnership', 'First Nations Engagement Protocols', 'Cultural Awareness',
+          'Stakeholder Engagement', 'Stakeholder Mapping', 'Stakeholder Management Plans',
+          'Content Creation', 'Copywriting', 'Speechwriting', 'Editing & Proofreading',
+          'Brand Management', 'Corporate Identity', 'Design Thinking',
+          'Digital Communications', 'Social Media', 'Website Management', 'SEO',
+          'Event Management', 'Conference Management', 'Executive Profiling',
+          'Reputation Management', 'Public Relations', 'Media Monitoring',
+          'Change Communications', 'Employee Engagement Communications',
+          'Campaign Management', 'Publications', 'Annual Reports'
+        ],
+        'Leadership & Management': [
+          'Leadership', 'Executive Leadership', 'People Management', 'Team Leadership',
+          'Servant Leadership', 'Strategic Leadership', 'Adaptive Leadership',
+          'Performance Management', 'Coaching', 'Mentoring', 'Facilitation',
+          'Meeting Facilitation', 'Workshop Design', 'Training Facilitation',
+          'Stakeholder Engagement', 'Executive Stakeholder Management',
+          'Negotiation', 'Influencing', 'Conflict Resolution', 'Mediation',
+          'Communication', 'Presentation Skills', 'Executive Reporting', 'Board Reporting',
+          'Budget Management', 'Financial Oversight', 'P&L Management',
+          'Strategy Execution', 'Business Planning', 'Operational Planning',
+          'Governance', 'Corporate Governance', 'Committee Management',
+          'Change Leadership', 'Cultural Change', 'Transformation Leadership',
+          'Delegation', 'Accountability Frameworks', 'Decision Making',
+          'Critical Thinking', 'Problem Solving', 'Innovation', 'Design Thinking',
+          'Emotional Intelligence', 'Psychological Safety'
+        ]
+      };      const [interests, setInterests] = useState([]);
 
       useEffect(() => {
         const loadData = async () => {
@@ -467,6 +655,1828 @@ window.storage = {
     await saveInterests(updatedInterests);
   };
 
+  const JOB_TITLE_SKILLS = {
+
+    // ── ENERGY TRADING & MARKETS ─────────────────────────────────────────
+    'spot market trader': [
+      { name: 'Energy Trading', level: 'Advanced', category: 'General' },
+      { name: 'NEM (National Energy Market)', level: 'Expert', category: 'General' },
+      { name: 'Wholesale Market', level: 'Advanced', category: 'General' },
+      { name: 'Electricity Markets', level: 'Advanced', category: 'General' },
+      { name: 'Ancillary Services', level: 'Advanced', category: 'General' },
+      { name: 'Derivatives', level: 'Intermediate', category: 'General' },
+      { name: 'Hedging', level: 'Advanced', category: 'General' },
+      { name: 'Market Risk', level: 'Advanced', category: 'General' },
+      { name: 'Load Forecasting', level: 'Intermediate', category: 'General' },
+      { name: 'Financial Modelling', level: 'Intermediate', category: 'Analytics' },
+    ],
+    'physical energy trader': [
+      { name: 'Energy Trading', level: 'Advanced', category: 'General' },
+      { name: 'NEM (National Energy Market)', level: 'Expert', category: 'General' },
+      { name: 'Wholesale Market', level: 'Advanced', category: 'General' },
+      { name: 'Electricity Markets', level: 'Advanced', category: 'General' },
+      { name: 'Physical Energy', level: 'Expert', category: 'General' },
+      { name: 'Dispatch Optimisation', level: 'Advanced', category: 'General' },
+      { name: 'Market Risk', level: 'Advanced', category: 'General' },
+      { name: 'Load Forecasting', level: 'Advanced', category: 'General' },
+    ],
+    'forward market trader': [
+      { name: 'Energy Trading', level: 'Advanced', category: 'General' },
+      { name: 'NEM (National Energy Market)', level: 'Advanced', category: 'General' },
+      { name: 'Derivatives', level: 'Expert', category: 'General' },
+      { name: 'Hedging', level: 'Expert', category: 'General' },
+      { name: 'Market Risk', level: 'Advanced', category: 'General' },
+      { name: 'Financial Modelling', level: 'Advanced', category: 'Analytics' },
+      { name: 'Electricity Markets', level: 'Advanced', category: 'General' },
+    ],
+    'principal trader': [
+      { name: 'Energy Trading', level: 'Expert', category: 'General' },
+      { name: 'NEM (National Energy Market)', level: 'Expert', category: 'General' },
+      { name: 'Wholesale Market', level: 'Expert', category: 'General' },
+      { name: 'Electricity Markets', level: 'Expert', category: 'General' },
+      { name: 'Derivatives', level: 'Expert', category: 'General' },
+      { name: 'Hedging', level: 'Expert', category: 'General' },
+      { name: 'Market Risk', level: 'Expert', category: 'General' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+    ],
+    'trading risk specialist': [
+      { name: 'Market Risk', level: 'Expert', category: 'General' },
+      { name: 'Risk Management', level: 'Expert', category: 'General' },
+      { name: 'Energy Trading', level: 'Advanced', category: 'General' },
+      { name: 'Derivatives', level: 'Advanced', category: 'General' },
+      { name: 'Financial Modelling', level: 'Advanced', category: 'Analytics' },
+      { name: 'Quantitative Analysis', level: 'Advanced', category: 'Analytics' },
+      { name: 'NEM (National Energy Market)', level: 'Advanced', category: 'General' },
+    ],
+    'trading risk analyst': [
+      { name: 'Market Risk', level: 'Advanced', category: 'General' },
+      { name: 'Risk Management', level: 'Intermediate', category: 'General' },
+      { name: 'Energy Trading', level: 'Intermediate', category: 'General' },
+      { name: 'Derivatives', level: 'Intermediate', category: 'General' },
+      { name: 'Financial Modelling', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Data Analysis', level: 'Advanced', category: 'Analytics' },
+    ],
+    'portfolio and trading strategy': [
+      { name: 'Energy Trading', level: 'Advanced', category: 'General' },
+      { name: 'Strategic Planning', level: 'Advanced', category: 'Strategy' },
+      { name: 'NEM (National Energy Market)', level: 'Advanced', category: 'General' },
+      { name: 'Financial Modelling', level: 'Advanced', category: 'Analytics' },
+      { name: 'Market Risk', level: 'Advanced', category: 'General' },
+      { name: 'Electricity Markets', level: 'Advanced', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Intermediate', category: 'Management' },
+    ],
+    'modelling & analytics specialist': [
+      { name: 'Energy Modelling', level: 'Expert', category: 'Analytics' },
+      { name: 'Financial Modelling', level: 'Advanced', category: 'Analytics' },
+      { name: 'Data Analysis', level: 'Advanced', category: 'Analytics' },
+      { name: 'Python', level: 'Advanced', category: 'Programming' },
+      { name: 'NEM (National Energy Market)', level: 'Advanced', category: 'General' },
+      { name: 'Load Forecasting', level: 'Advanced', category: 'General' },
+      { name: 'SQL', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Power BI', level: 'Intermediate', category: 'Analytics' },
+    ],
+    'modelling analyst': [
+      { name: 'Energy Modelling', level: 'Advanced', category: 'Analytics' },
+      { name: 'Financial Modelling', level: 'Advanced', category: 'Analytics' },
+      { name: 'Data Analysis', level: 'Advanced', category: 'Analytics' },
+      { name: 'Python', level: 'Intermediate', category: 'Programming' },
+      { name: 'NEM (National Energy Market)', level: 'Intermediate', category: 'General' },
+      { name: 'Load Forecasting', level: 'Intermediate', category: 'General' },
+      { name: 'Excel (Advanced)', level: 'Advanced', category: 'Analytics' },
+    ],
+    'modelling specialist': [
+      { name: 'Energy Modelling', level: 'Expert', category: 'Analytics' },
+      { name: 'Renewable Energy', level: 'Advanced', category: 'General' },
+      { name: 'Financial Modelling', level: 'Advanced', category: 'Analytics' },
+      { name: 'Python', level: 'Advanced', category: 'Programming' },
+      { name: 'Data Analysis', level: 'Advanced', category: 'Analytics' },
+      { name: 'Load Forecasting', level: 'Advanced', category: 'General' },
+    ],
+    'physical energy manager': [
+      { name: 'Physical Energy', level: 'Expert', category: 'General' },
+      { name: 'Energy Trading', level: 'Expert', category: 'General' },
+      { name: 'NEM (National Energy Market)', level: 'Expert', category: 'General' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Dispatch Optimisation', level: 'Advanced', category: 'General' },
+      { name: 'Market Risk', level: 'Advanced', category: 'General' },
+    ],
+    'forward market manager': [
+      { name: 'Energy Trading', level: 'Expert', category: 'General' },
+      { name: 'Derivatives', level: 'Expert', category: 'General' },
+      { name: 'Hedging', level: 'Expert', category: 'General' },
+      { name: 'Market Risk', level: 'Advanced', category: 'General' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Financial Modelling', level: 'Advanced', category: 'Analytics' },
+    ],
+    'retail data analyst': [
+      { name: 'Data Analysis', level: 'Advanced', category: 'Analytics' },
+      { name: 'Retail Energy', level: 'Advanced', category: 'General' },
+      { name: 'SQL', level: 'Advanced', category: 'Analytics' },
+      { name: 'Power BI', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Excel (Advanced)', level: 'Advanced', category: 'Analytics' },
+      { name: 'Data Visualisation', level: 'Intermediate', category: 'Analytics' },
+    ],
+    'retail market systems': [
+      { name: 'Retail Energy', level: 'Advanced', category: 'General' },
+      { name: 'Market Systems', level: 'Advanced', category: 'General' },
+      { name: 'NEM (National Energy Market)', level: 'Advanced', category: 'General' },
+      { name: 'Data Analysis', level: 'Advanced', category: 'Analytics' },
+      { name: 'Leadership', level: 'Intermediate', category: 'Management' },
+      { name: 'Business Analysis', level: 'Intermediate', category: 'Analytics' },
+    ],
+    'retail operations': [
+      { name: 'Retail Energy', level: 'Advanced', category: 'General' },
+      { name: 'Customer Service', level: 'Advanced', category: 'General' },
+      { name: 'Operations Management', level: 'Intermediate', category: 'Management' },
+      { name: 'Data Analysis', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Communication', level: 'Advanced', category: 'Management' },
+    ],
+    'account manager - retail': [
+      { name: 'Retail Energy', level: 'Advanced', category: 'General' },
+      { name: 'Account Management', level: 'Advanced', category: 'General' },
+      { name: 'Customer Relationship Management', level: 'Advanced', category: 'General' },
+      { name: 'Commercial Management', level: 'Intermediate', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Negotiation', level: 'Intermediate', category: 'General' },
+    ],
+    'settlements officer': [
+      { name: 'NEM (National Energy Market)', level: 'Advanced', category: 'General' },
+      { name: 'Market Settlements', level: 'Advanced', category: 'General' },
+      { name: 'Financial Reconciliation', level: 'Advanced', category: 'General' },
+      { name: 'Data Analysis', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Excel (Advanced)', level: 'Advanced', category: 'Analytics' },
+    ],
+
+    // ── ENERGY COMMERCIAL & REGULATORY ──────────────────────────────────
+    'commercial manager - ppa': [
+      { name: 'Power Purchase Agreements', level: 'Expert', category: 'General' },
+      { name: 'Commercial Management', level: 'Advanced', category: 'General' },
+      { name: 'Contract Negotiation', level: 'Advanced', category: 'General' },
+      { name: 'Renewable Energy', level: 'Advanced', category: 'General' },
+      { name: 'Financial Modelling', level: 'Advanced', category: 'Analytics' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+    ],
+    'commercial manager - offtake': [
+      { name: 'Power Purchase Agreements', level: 'Expert', category: 'General' },
+      { name: 'Commercial Management', level: 'Expert', category: 'General' },
+      { name: 'Contract Negotiation', level: 'Expert', category: 'General' },
+      { name: 'Business Development', level: 'Advanced', category: 'Strategy' },
+      { name: 'Financial Modelling', level: 'Advanced', category: 'Analytics' },
+    ],
+    'commercial manager': [
+      { name: 'Commercial Management', level: 'Advanced', category: 'General' },
+      { name: 'Contract Negotiation', level: 'Advanced', category: 'General' },
+      { name: 'Financial Modelling', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Risk Management', level: 'Intermediate', category: 'General' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+    ],
+    'commercial advisor': [
+      { name: 'Commercial Management', level: 'Advanced', category: 'General' },
+      { name: 'Contract Administration', level: 'Advanced', category: 'General' },
+      { name: 'Financial Modelling', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Risk Management', level: 'Intermediate', category: 'General' },
+    ],
+    'commercial officer': [
+      { name: 'Commercial Management', level: 'Intermediate', category: 'General' },
+      { name: 'Contract Administration', level: 'Intermediate', category: 'General' },
+      { name: 'Data Analysis', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Reporting', level: 'Intermediate', category: 'Analytics' },
+    ],
+    'development commercial advisor': [
+      { name: 'Commercial Management', level: 'Advanced', category: 'General' },
+      { name: 'Power Purchase Agreements', level: 'Advanced', category: 'General' },
+      { name: 'Renewable Energy', level: 'Advanced', category: 'General' },
+      { name: 'Financial Modelling', level: 'Advanced', category: 'Analytics' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Contract Negotiation', level: 'Advanced', category: 'General' },
+    ],
+    'contracts and commercial support analyst': [
+      { name: 'Contract Administration', level: 'Advanced', category: 'General' },
+      { name: 'Commercial Management', level: 'Intermediate', category: 'General' },
+      { name: 'Data Analysis', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Reporting', level: 'Intermediate', category: 'Analytics' },
+    ],
+    'regulatory and policy advisor': [
+      { name: 'Energy Policy', level: 'Advanced', category: 'General' },
+      { name: 'Regulatory Compliance', level: 'Advanced', category: 'General' },
+      { name: 'Policy Analysis', level: 'Advanced', category: 'Strategy' },
+      { name: 'NEM (National Energy Market)', level: 'Advanced', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Research', level: 'Advanced', category: 'Research' },
+    ],
+    'customer strategy consultant': [
+      { name: 'Strategic Planning', level: 'Advanced', category: 'Strategy' },
+      { name: 'Customer Relationship Management', level: 'Advanced', category: 'General' },
+      { name: 'Retail Energy', level: 'Intermediate', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Business Case Development', level: 'Advanced', category: 'General' },
+      { name: 'Market Research', level: 'Intermediate', category: 'Research' },
+    ],
+    'product manager - energy solutions': [
+      { name: 'Product Management', level: 'Advanced', category: 'Management' },
+      { name: 'Retail Energy', level: 'Advanced', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Business Case Development', level: 'Advanced', category: 'General' },
+      { name: 'Market Research', level: 'Intermediate', category: 'Research' },
+      { name: 'Digital Transformation', level: 'Intermediate', category: 'Strategy' },
+    ],
+    'product, partnership': [
+      { name: 'Product Management', level: 'Advanced', category: 'Management' },
+      { name: 'Business Development', level: 'Advanced', category: 'Strategy' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Innovation', level: 'Advanced', category: 'Strategy' },
+      { name: 'Contract Negotiation', level: 'Intermediate', category: 'General' },
+      { name: 'Market Research', level: 'Intermediate', category: 'Research' },
+    ],
+
+    // ── ELECTRICAL ENGINEERING ──────────────────────────────────────────
+    'lead electrical and controls': [
+      { name: 'Electrical Engineering', level: 'Expert', category: 'General' },
+      { name: 'Control Systems', level: 'Expert', category: 'General' },
+      { name: 'HV/LV Systems', level: 'Advanced', category: 'General' },
+      { name: 'Instrumentation', level: 'Advanced', category: 'General' },
+      { name: 'SCADA Systems', level: 'Advanced', category: 'General' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Protection & Relay', level: 'Advanced', category: 'General' },
+    ],
+    'electrical engineer': [
+      { name: 'Electrical Engineering', level: 'Advanced', category: 'General' },
+      { name: 'HV/LV Systems', level: 'Advanced', category: 'General' },
+      { name: 'Protection & Relay', level: 'Intermediate', category: 'General' },
+      { name: 'Switchgear', level: 'Intermediate', category: 'General' },
+      { name: 'AutoCAD', level: 'Intermediate', category: 'General' },
+      { name: 'Safety Engineering', level: 'Intermediate', category: 'General' },
+      { name: 'Commissioning', level: 'Intermediate', category: 'General' },
+      { name: 'Fault Analysis', level: 'Intermediate', category: 'General' },
+    ],
+    'electrical technician': [
+      { name: 'Electrical Engineering', level: 'Intermediate', category: 'General' },
+      { name: 'HV/LV Systems', level: 'Intermediate', category: 'General' },
+      { name: 'Instrumentation', level: 'Intermediate', category: 'General' },
+      { name: 'Safety (WHS)', level: 'Advanced', category: 'General' },
+      { name: 'Condition Monitoring', level: 'Intermediate', category: 'General' },
+      { name: 'Maintenance Planning', level: 'Beginner', category: 'General' },
+    ],
+    'electrical tradesperson': [
+      { name: 'Electrical Engineering', level: 'Intermediate', category: 'General' },
+      { name: 'HV/LV Systems', level: 'Intermediate', category: 'General' },
+      { name: 'Safety (WHS)', level: 'Advanced', category: 'General' },
+      { name: 'Fault Analysis', level: 'Intermediate', category: 'General' },
+      { name: 'Maintenance Planning', level: 'Beginner', category: 'General' },
+    ],
+    'electrician': [
+      { name: 'Electrical Engineering', level: 'Intermediate', category: 'General' },
+      { name: 'HV/LV Systems', level: 'Intermediate', category: 'General' },
+      { name: 'Safety (WHS)', level: 'Advanced', category: 'General' },
+      { name: 'Fault Analysis', level: 'Intermediate', category: 'General' },
+    ],
+    'electrical apprentice': [
+      { name: 'Electrical Engineering', level: 'Beginner', category: 'General' },
+      { name: 'Safety (WHS)', level: 'Intermediate', category: 'General' },
+      { name: 'HV/LV Systems', level: 'Beginner', category: 'General' },
+    ],
+    'electrical / instrumentation apprentice': [
+      { name: 'Electrical Engineering', level: 'Beginner', category: 'General' },
+      { name: 'Instrumentation', level: 'Beginner', category: 'General' },
+      { name: 'Safety (WHS)', level: 'Intermediate', category: 'General' },
+    ],
+    'safe work & electrical safety': [
+      { name: 'Electrical Engineering', level: 'Advanced', category: 'General' },
+      { name: 'Safety (WHS)', level: 'Expert', category: 'General' },
+      { name: 'Safety Engineering', level: 'Expert', category: 'General' },
+      { name: 'Permits to Work', level: 'Expert', category: 'General' },
+      { name: 'Risk Management', level: 'Advanced', category: 'General' },
+    ],
+    'technical officer - electrical': [
+      { name: 'Electrical Engineering', level: 'Intermediate', category: 'General' },
+      { name: 'HV/LV Systems', level: 'Intermediate', category: 'General' },
+      { name: 'Safety (WHS)', level: 'Advanced', category: 'General' },
+      { name: 'Maintenance Planning', level: 'Intermediate', category: 'General' },
+    ],
+    'senior electrical tradesperson': [
+      { name: 'Electrical Engineering', level: 'Advanced', category: 'General' },
+      { name: 'HV/LV Systems', level: 'Advanced', category: 'General' },
+      { name: 'Safety (WHS)', level: 'Advanced', category: 'General' },
+      { name: 'Fault Analysis', level: 'Advanced', category: 'General' },
+      { name: 'Mentoring', level: 'Intermediate', category: 'Management' },
+    ],
+
+    // ── MECHANICAL ENGINEERING ──────────────────────────────────────────
+    'mechanical engineer': [
+      { name: 'Mechanical Engineering', level: 'Advanced', category: 'General' },
+      { name: 'Plant Operations', level: 'Intermediate', category: 'General' },
+      { name: 'Condition Monitoring', level: 'Intermediate', category: 'General' },
+      { name: 'Reliability Engineering', level: 'Intermediate', category: 'General' },
+      { name: 'Maintenance Planning', level: 'Intermediate', category: 'General' },
+      { name: 'Safety (WHS)', level: 'Intermediate', category: 'General' },
+    ],
+    'mechanical technician': [
+      { name: 'Mechanical Engineering', level: 'Intermediate', category: 'General' },
+      { name: 'Plant Operations', level: 'Intermediate', category: 'General' },
+      { name: 'Condition Monitoring', level: 'Intermediate', category: 'General' },
+      { name: 'Safety (WHS)', level: 'Advanced', category: 'General' },
+      { name: 'Maintenance Planning', level: 'Intermediate', category: 'General' },
+    ],
+    'mechanical tradesperson': [
+      { name: 'Mechanical Engineering', level: 'Intermediate', category: 'General' },
+      { name: 'Plant Operations', level: 'Intermediate', category: 'General' },
+      { name: 'Safety (WHS)', level: 'Advanced', category: 'General' },
+      { name: 'Maintenance Planning', level: 'Beginner', category: 'General' },
+    ],
+    'mechanical fitter': [
+      { name: 'Mechanical Engineering', level: 'Intermediate', category: 'General' },
+      { name: 'Plant Operations', level: 'Intermediate', category: 'General' },
+      { name: 'Safety (WHS)', level: 'Advanced', category: 'General' },
+    ],
+    'mechanical apprentice': [
+      { name: 'Mechanical Engineering', level: 'Beginner', category: 'General' },
+      { name: 'Safety (WHS)', level: 'Intermediate', category: 'General' },
+      { name: 'Plant Operations', level: 'Beginner', category: 'General' },
+    ],
+
+    // ── CONTROL SYSTEMS & INSTRUMENTATION ───────────────────────────────
+    'control systems engineer': [
+      { name: 'Control Systems', level: 'Expert', category: 'General' },
+      { name: 'SCADA Systems', level: 'Advanced', category: 'General' },
+      { name: 'Instrumentation', level: 'Advanced', category: 'General' },
+      { name: 'PLC Programming', level: 'Advanced', category: 'Programming' },
+      { name: 'Electrical Engineering', level: 'Advanced', category: 'General' },
+      { name: 'Commissioning', level: 'Intermediate', category: 'General' },
+      { name: 'Safety Engineering', level: 'Intermediate', category: 'General' },
+      { name: 'HV/LV Systems', level: 'Intermediate', category: 'General' },
+    ],
+    'control systems technician': [
+      { name: 'Control Systems', level: 'Advanced', category: 'General' },
+      { name: 'SCADA Systems', level: 'Advanced', category: 'General' },
+      { name: 'Instrumentation', level: 'Advanced', category: 'General' },
+      { name: 'PLC Programming', level: 'Intermediate', category: 'Programming' },
+      { name: 'Safety (WHS)', level: 'Advanced', category: 'General' },
+    ],
+    'systems specialist': [
+      { name: 'Control Systems', level: 'Advanced', category: 'General' },
+      { name: 'SCADA Systems', level: 'Advanced', category: 'General' },
+      { name: 'Instrumentation', level: 'Advanced', category: 'General' },
+      { name: 'Technical Documentation', level: 'Intermediate', category: 'General' },
+      { name: 'Safety (WHS)', level: 'Intermediate', category: 'General' },
+    ],
+
+    // ── ASSET MANAGEMENT & MAINTENANCE ──────────────────────────────────
+    'asset specialist': [
+      { name: 'Asset Management', level: 'Advanced', category: 'General' },
+      { name: 'Maintenance Planning', level: 'Advanced', category: 'General' },
+      { name: 'SAP PM', level: 'Advanced', category: 'General' },
+      { name: 'Reliability Engineering', level: 'Intermediate', category: 'General' },
+      { name: 'Condition Monitoring', level: 'Intermediate', category: 'General' },
+      { name: 'Data Analysis', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Budget Management', level: 'Beginner', category: 'General' },
+    ],
+    'portfolio asset manager': [
+      { name: 'Asset Management', level: 'Advanced', category: 'General' },
+      { name: 'Portfolio Management', level: 'Advanced', category: 'Management' },
+      { name: 'Financial Modelling', level: 'Advanced', category: 'Analytics' },
+      { name: 'Risk Management', level: 'Advanced', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Capital Works', level: 'Advanced', category: 'General' },
+      { name: 'SAP PM', level: 'Intermediate', category: 'General' },
+    ],
+    'maintenance management officer': [
+      { name: 'Maintenance Planning', level: 'Advanced', category: 'General' },
+      { name: 'SAP PM', level: 'Advanced', category: 'General' },
+      { name: 'Asset Management', level: 'Intermediate', category: 'General' },
+      { name: 'Scheduling', level: 'Advanced', category: 'Management' },
+      { name: 'Safety (WHS)', level: 'Intermediate', category: 'General' },
+      { name: 'Reporting', level: 'Intermediate', category: 'Analytics' },
+    ],
+    'maintenance reliability engineer': [
+      { name: 'Reliability Engineering', level: 'Expert', category: 'General' },
+      { name: 'Maintenance Planning', level: 'Advanced', category: 'General' },
+      { name: 'Condition Monitoring', level: 'Advanced', category: 'General' },
+      { name: 'SAP PM', level: 'Intermediate', category: 'General' },
+      { name: 'Root Cause Analysis', level: 'Advanced', category: 'General' },
+      { name: 'Asset Management', level: 'Advanced', category: 'General' },
+    ],
+    'maintenance administration officer': [
+      { name: 'Maintenance Planning', level: 'Intermediate', category: 'General' },
+      { name: 'SAP PM', level: 'Intermediate', category: 'General' },
+      { name: 'Document Control', level: 'Advanced', category: 'General' },
+      { name: 'Scheduling', level: 'Advanced', category: 'Management' },
+      { name: 'Reporting', level: 'Intermediate', category: 'Analytics' },
+    ],
+    'engineering lead': [
+      { name: 'Engineering Management', level: 'Advanced', category: 'Management' },
+      { name: 'Reliability Engineering', level: 'Advanced', category: 'General' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Technical Documentation', level: 'Advanced', category: 'General' },
+      { name: 'Mentoring', level: 'Advanced', category: 'Management' },
+    ],
+    'engineering manager': [
+      { name: 'Engineering Management', level: 'Expert', category: 'Management' },
+      { name: 'Capital Works', level: 'Advanced', category: 'General' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Budget Management', level: 'Advanced', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Safety Engineering', level: 'Advanced', category: 'General' },
+      { name: 'Risk Management', level: 'Advanced', category: 'General' },
+    ],
+    'engineering and technical services superintendent': [
+      { name: 'Engineering Management', level: 'Advanced', category: 'Management' },
+      { name: 'Asset Management', level: 'Advanced', category: 'General' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Maintenance Planning', level: 'Advanced', category: 'General' },
+      { name: 'Safety (WHS)', level: 'Advanced', category: 'General' },
+      { name: 'Budget Management', level: 'Intermediate', category: 'General' },
+    ],
+    'asset manager': [
+      { name: 'Asset Management', level: 'Advanced', category: 'General' },
+      { name: 'Reliability Engineering', level: 'Intermediate', category: 'General' },
+      { name: 'Maintenance Planning', level: 'Intermediate', category: 'General' },
+      { name: 'Capital Works', level: 'Intermediate', category: 'General' },
+      { name: 'Risk Management', level: 'Intermediate', category: 'General' },
+      { name: 'Budget Management', level: 'Intermediate', category: 'General' },
+      { name: 'SAP PM', level: 'Intermediate', category: 'General' },
+    ],
+
+    // ── OPERATIONS & SITE ────────────────────────────────────────────────
+    'production superintendent': [
+      { name: 'Plant Operations', level: 'Expert', category: 'General' },
+      { name: 'Safety (WHS)', level: 'Expert', category: 'General' },
+      { name: 'Operations Management', level: 'Advanced', category: 'Management' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'SCADA Systems', level: 'Advanced', category: 'General' },
+      { name: 'Hydro Operations', level: 'Advanced', category: 'General' },
+      { name: 'Budget Management', level: 'Intermediate', category: 'General' },
+      { name: 'Maintenance Planning', level: 'Advanced', category: 'General' },
+    ],
+    'bess superintendent': [
+      { name: 'Battery Storage', level: 'Expert', category: 'General' },
+      { name: 'Plant Operations', level: 'Advanced', category: 'General' },
+      { name: 'Safety (WHS)', level: 'Expert', category: 'General' },
+      { name: 'Operations Management', level: 'Advanced', category: 'Management' },
+      { name: 'SCADA Systems', level: 'Intermediate', category: 'General' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+    ],
+    'site manager': [
+      { name: 'Operations Management', level: 'Advanced', category: 'Management' },
+      { name: 'Safety (WHS)', level: 'Expert', category: 'General' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Maintenance Planning', level: 'Advanced', category: 'General' },
+      { name: 'Budget Management', level: 'Intermediate', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Intermediate', category: 'Management' },
+      { name: 'Asset Management', level: 'Intermediate', category: 'General' },
+    ],
+    'maintenance and site services superintendent': [
+      { name: 'Maintenance Planning', level: 'Expert', category: 'General' },
+      { name: 'Plant Operations', level: 'Advanced', category: 'General' },
+      { name: 'Safety (WHS)', level: 'Expert', category: 'General' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Asset Management', level: 'Advanced', category: 'General' },
+      { name: 'Budget Management', level: 'Intermediate', category: 'General' },
+    ],
+    'outage manager': [
+      { name: 'Outage Management', level: 'Expert', category: 'General' },
+      { name: 'Project Management', level: 'Advanced', category: 'Management' },
+      { name: 'Plant Operations', level: 'Advanced', category: 'General' },
+      { name: 'Safety (WHS)', level: 'Expert', category: 'General' },
+      { name: 'Scheduling', level: 'Advanced', category: 'Management' },
+      { name: 'Contractor Management', level: 'Advanced', category: 'Management' },
+      { name: 'Risk & Issues Management', level: 'Advanced', category: 'Management' },
+    ],
+    'maintainer operator': [
+      { name: 'Plant Operations', level: 'Advanced', category: 'General' },
+      { name: 'Safety (WHS)', level: 'Advanced', category: 'General' },
+      { name: 'SCADA Systems', level: 'Intermediate', category: 'General' },
+      { name: 'Maintenance Planning', level: 'Intermediate', category: 'General' },
+      { name: 'Condition Monitoring', level: 'Intermediate', category: 'General' },
+    ],
+    'operator maintainer': [
+      { name: 'Plant Operations', level: 'Advanced', category: 'General' },
+      { name: 'Safety (WHS)', level: 'Advanced', category: 'General' },
+      { name: 'SCADA Systems', level: 'Intermediate', category: 'General' },
+      { name: 'Maintenance Planning', level: 'Intermediate', category: 'General' },
+    ],
+    'operations improvement lead': [
+      { name: 'Continuous Improvement', level: 'Advanced', category: 'Management' },
+      { name: 'Operations Management', level: 'Advanced', category: 'Management' },
+      { name: 'Data Analysis', level: 'Advanced', category: 'Analytics' },
+      { name: 'Process Improvement', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Change Management', level: 'Intermediate', category: 'Management' },
+      { name: 'Lean / Six Sigma', level: 'Advanced', category: 'Management' },
+    ],
+    'plant officer': [
+      { name: 'Plant Operations', level: 'Intermediate', category: 'General' },
+      { name: 'Safety (WHS)', level: 'Advanced', category: 'General' },
+      { name: 'SCADA Systems', level: 'Beginner', category: 'General' },
+      { name: 'Maintenance Planning', level: 'Beginner', category: 'General' },
+    ],
+
+    // ── PROJECT DELIVERY ─────────────────────────────────────────────────
+    'project manager - development': [
+      { name: 'Project Management', level: 'Advanced', category: 'Management' },
+      { name: 'Renewable Energy', level: 'Advanced', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Risk & Issues Management', level: 'Advanced', category: 'Management' },
+      { name: 'Budget Management', level: 'Advanced', category: 'General' },
+      { name: 'Contract Administration', level: 'Intermediate', category: 'General' },
+      { name: 'Environmental Approvals', level: 'Intermediate', category: 'General' },
+    ],
+    'construction project manager': [
+      { name: 'Project Management', level: 'Advanced', category: 'Management' },
+      { name: 'Construction Management', level: 'Expert', category: 'Management' },
+      { name: 'Contract Administration', level: 'Advanced', category: 'General' },
+      { name: 'Safety (WHS)', level: 'Expert', category: 'General' },
+      { name: 'Risk & Issues Management', level: 'Advanced', category: 'Management' },
+      { name: 'Budget Management', level: 'Advanced', category: 'General' },
+      { name: 'Scheduling', level: 'Advanced', category: 'Management' },
+      { name: 'Contractor Management', level: 'Advanced', category: 'Management' },
+    ],
+    'project delivery manager': [
+      { name: 'Project Management', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Budget Management', level: 'Advanced', category: 'General' },
+      { name: 'Risk & Issues Management', level: 'Advanced', category: 'Management' },
+      { name: 'Governance', level: 'Intermediate', category: 'Management' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+    ],
+    'project controls & planning manager': [
+      { name: 'Project Controls', level: 'Expert', category: 'Management' },
+      { name: 'Scheduling (MS Project)', level: 'Expert', category: 'Management' },
+      { name: 'Risk & Issues Management', level: 'Advanced', category: 'Management' },
+      { name: 'Budget Management', level: 'Advanced', category: 'General' },
+      { name: 'Earned Value Management', level: 'Advanced', category: 'Management' },
+      { name: 'Reporting', level: 'Advanced', category: 'Analytics' },
+    ],
+    'project engineer (electrical)': [
+      { name: 'Electrical Engineering', level: 'Advanced', category: 'General' },
+      { name: 'Project Management', level: 'Intermediate', category: 'Management' },
+      { name: 'HV/LV Systems', level: 'Intermediate', category: 'General' },
+      { name: 'Commissioning', level: 'Intermediate', category: 'General' },
+      { name: 'Safety Engineering', level: 'Intermediate', category: 'General' },
+      { name: 'AutoCAD', level: 'Intermediate', category: 'General' },
+      { name: 'Contract Administration', level: 'Beginner', category: 'General' },
+    ],
+    'project engineer - civil': [
+      { name: 'Civil Engineering', level: 'Advanced', category: 'General' },
+      { name: 'Project Management', level: 'Intermediate', category: 'Management' },
+      { name: 'Contract Administration', level: 'Intermediate', category: 'General' },
+      { name: 'Safety (WHS)', level: 'Intermediate', category: 'General' },
+      { name: 'AutoCAD', level: 'Intermediate', category: 'General' },
+    ],
+    'project engineer - grid': [
+      { name: 'Electrical Engineering', level: 'Advanced', category: 'General' },
+      { name: 'Grid Management', level: 'Advanced', category: 'General' },
+      { name: 'Project Management', level: 'Intermediate', category: 'Management' },
+      { name: 'HV/LV Systems', level: 'Advanced', category: 'General' },
+      { name: 'Commissioning', level: 'Advanced', category: 'General' },
+      { name: 'Safety Engineering', level: 'Intermediate', category: 'General' },
+    ],
+    'project engineer': [
+      { name: 'Project Management', level: 'Intermediate', category: 'Management' },
+      { name: 'Engineering Management', level: 'Intermediate', category: 'Management' },
+      { name: 'Safety (WHS)', level: 'Intermediate', category: 'General' },
+      { name: 'Contract Administration', level: 'Intermediate', category: 'General' },
+      { name: 'Budget Management', level: 'Beginner', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Intermediate', category: 'Management' },
+    ],
+    'project manager': [
+      { name: 'Project Management', level: 'Advanced', category: 'Management' },
+      { name: 'Risk & Issues Management', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Budget Management', level: 'Intermediate', category: 'General' },
+      { name: 'Scheduling (MS Project)', level: 'Intermediate', category: 'Management' },
+      { name: 'Contract Administration', level: 'Intermediate', category: 'General' },
+      { name: 'Communication', level: 'Advanced', category: 'Management' },
+    ],
+    'project coordinator': [
+      { name: 'Project Management', level: 'Intermediate', category: 'Management' },
+      { name: 'Scheduling', level: 'Intermediate', category: 'Management' },
+      { name: 'Document Control', level: 'Advanced', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Intermediate', category: 'Management' },
+      { name: 'Communication', level: 'Intermediate', category: 'Management' },
+      { name: 'Reporting', level: 'Intermediate', category: 'Analytics' },
+    ],
+    'project support officer': [
+      { name: 'Project Management', level: 'Beginner', category: 'Management' },
+      { name: 'Document Control', level: 'Advanced', category: 'General' },
+      { name: 'Communication', level: 'Intermediate', category: 'Management' },
+      { name: 'Reporting', level: 'Intermediate', category: 'Analytics' },
+    ],
+    'contract administrator': [
+      { name: 'Contract Administration', level: 'Expert', category: 'General' },
+      { name: 'Commercial Management', level: 'Intermediate', category: 'General' },
+      { name: 'Procurement', level: 'Intermediate', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Intermediate', category: 'Management' },
+      { name: 'Risk Management', level: 'Intermediate', category: 'General' },
+      { name: 'SAP', level: 'Beginner', category: 'General' },
+    ],
+    'contracts lead': [
+      { name: 'Contract Administration', level: 'Expert', category: 'General' },
+      { name: 'Contract Negotiation', level: 'Expert', category: 'General' },
+      { name: 'Commercial Management', level: 'Advanced', category: 'General' },
+      { name: 'Procurement', level: 'Advanced', category: 'General' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Risk Management', level: 'Advanced', category: 'General' },
+    ],
+    'project controller': [
+      { name: 'Project Controls', level: 'Advanced', category: 'Management' },
+      { name: 'Scheduling (MS Project)', level: 'Advanced', category: 'Management' },
+      { name: 'Budget Management', level: 'Advanced', category: 'General' },
+      { name: 'Reporting', level: 'Advanced', category: 'Analytics' },
+      { name: 'Earned Value Management', level: 'Advanced', category: 'Management' },
+    ],
+
+    // ── PROGRAM & PORTFOLIO MANAGEMENT ──────────────────────────────────
+    'pmo lead': [
+      { name: 'PMO', level: 'Expert', category: 'Management' },
+      { name: 'Governance', level: 'Expert', category: 'Management' },
+      { name: 'Project Management', level: 'Advanced', category: 'Management' },
+      { name: 'Risk & Issues Management', level: 'Advanced', category: 'Management' },
+      { name: 'Reporting', level: 'Advanced', category: 'Analytics' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+    ],
+    'epmo analyst': [
+      { name: 'PMO', level: 'Intermediate', category: 'Management' },
+      { name: 'Data Analysis', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Reporting', level: 'Advanced', category: 'Analytics' },
+      { name: 'Governance', level: 'Intermediate', category: 'Management' },
+      { name: 'Excel (Advanced)', level: 'Advanced', category: 'Analytics' },
+    ],
+    'epmo coordinator': [
+      { name: 'PMO', level: 'Intermediate', category: 'Management' },
+      { name: 'Document Control', level: 'Advanced', category: 'General' },
+      { name: 'Reporting', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Scheduling', level: 'Intermediate', category: 'Management' },
+    ],
+    'd&t portfolio delivery manager': [
+      { name: 'IT Portfolio Management', level: 'Expert', category: 'Management' },
+      { name: 'Program Management', level: 'Advanced', category: 'Management' },
+      { name: 'Governance', level: 'Advanced', category: 'Management' },
+      { name: 'IT Delivery', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Risk & Issues Management', level: 'Advanced', category: 'Management' },
+      { name: 'Budget Management', level: 'Advanced', category: 'General' },
+    ],
+    'principal development manager': [
+      { name: 'Development Management', level: 'Expert', category: 'Management' },
+      { name: 'Renewable Energy', level: 'Advanced', category: 'General' },
+      { name: 'Commercial Management', level: 'Advanced', category: 'General' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Environmental Approvals', level: 'Advanced', category: 'General' },
+      { name: 'Financial Modelling', level: 'Advanced', category: 'Analytics' },
+    ],
+    'program manager': [
+      { name: 'Program Management', level: 'Advanced', category: 'Management' },
+      { name: 'PMO', level: 'Advanced', category: 'Management' },
+      { name: 'Risk & Issues Management', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Governance', level: 'Advanced', category: 'Management' },
+      { name: 'Budget Management', level: 'Advanced', category: 'General' },
+    ],
+    'portfolio definition lead': [
+      { name: 'Portfolio Management', level: 'Advanced', category: 'Management' },
+      { name: 'Strategic Planning', level: 'Advanced', category: 'Strategy' },
+      { name: 'Business Case Development', level: 'Advanced', category: 'General' },
+      { name: 'Governance', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+    ],
+    'grid connection manager': [
+      { name: 'Grid Management', level: 'Expert', category: 'General' },
+      { name: 'Renewable Energy', level: 'Advanced', category: 'General' },
+      { name: 'Electrical Engineering', level: 'Advanced', category: 'General' },
+      { name: 'Energy Policy', level: 'Intermediate', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Project Management', level: 'Advanced', category: 'Management' },
+    ],
+
+    // ── ENVIRONMENTAL & SUSTAINABILITY ───────────────────────────────────
+    'sustainability manager': [
+      { name: 'Sustainability', level: 'Expert', category: 'General' },
+      { name: 'ESG Reporting', level: 'Expert', category: 'General' },
+      { name: 'Carbon Accounting', level: 'Advanced', category: 'General' },
+      { name: 'Emissions Reporting', level: 'Advanced', category: 'General' },
+      { name: 'Energy Transition', level: 'Advanced', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Policy Analysis', level: 'Advanced', category: 'Strategy' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+    ],
+    'sustainability advisor': [
+      { name: 'Sustainability', level: 'Advanced', category: 'General' },
+      { name: 'ESG Reporting', level: 'Advanced', category: 'General' },
+      { name: 'Carbon Accounting', level: 'Intermediate', category: 'General' },
+      { name: 'Emissions Reporting', level: 'Intermediate', category: 'General' },
+      { name: 'Energy Transition', level: 'Intermediate', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Intermediate', category: 'Management' },
+      { name: 'Research', level: 'Advanced', category: 'Research' },
+    ],
+    'carbon specialist': [
+      { name: 'Carbon Accounting', level: 'Expert', category: 'General' },
+      { name: 'Emissions Reporting', level: 'Expert', category: 'General' },
+      { name: 'Sustainability', level: 'Advanced', category: 'General' },
+      { name: 'ESG Reporting', level: 'Advanced', category: 'General' },
+      { name: 'Regulatory Compliance', level: 'Advanced', category: 'General' },
+      { name: 'Data Analysis', level: 'Intermediate', category: 'Analytics' },
+    ],
+    'environmental manager': [
+      { name: 'Environmental Management', level: 'Expert', category: 'General' },
+      { name: 'Environmental Approvals', level: 'Expert', category: 'General' },
+      { name: 'Environmental Impact Assessment', level: 'Expert', category: 'General' },
+      { name: 'Regulatory Compliance', level: 'Advanced', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+    ],
+    'environmental specialist': [
+      { name: 'Environmental Management', level: 'Advanced', category: 'General' },
+      { name: 'Environmental Approvals', level: 'Advanced', category: 'General' },
+      { name: 'Environmental Impact Assessment', level: 'Advanced', category: 'General' },
+      { name: 'Regulatory Compliance', level: 'Advanced', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Intermediate', category: 'Management' },
+    ],
+    'environmental advisor': [
+      { name: 'Environmental Management', level: 'Advanced', category: 'General' },
+      { name: 'Environmental Approvals', level: 'Intermediate', category: 'General' },
+      { name: 'Regulatory Compliance', level: 'Intermediate', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Intermediate', category: 'Management' },
+      { name: 'Research', level: 'Intermediate', category: 'Research' },
+    ],
+
+    // ── HEALTH, SAFETY & ENVIRONMENT ─────────────────────────────────────
+    'senior process safety specialist': [
+      { name: 'Safety Engineering', level: 'Expert', category: 'General' },
+      { name: 'Safety (WHS)', level: 'Expert', category: 'General' },
+      { name: 'Process Safety', level: 'Expert', category: 'General' },
+      { name: 'Risk Management', level: 'Expert', category: 'General' },
+      { name: 'Incident Investigation', level: 'Advanced', category: 'General' },
+      { name: 'Regulatory Compliance', level: 'Advanced', category: 'General' },
+    ],
+    'health & safety manager': [
+      { name: 'Safety (WHS)', level: 'Expert', category: 'General' },
+      { name: 'Safety Engineering', level: 'Advanced', category: 'General' },
+      { name: 'Risk Management', level: 'Advanced', category: 'General' },
+      { name: 'Incident Investigation', level: 'Advanced', category: 'General' },
+      { name: 'Regulatory Compliance', level: 'Advanced', category: 'General' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+    ],
+    'health & safety specialist': [
+      { name: 'Safety (WHS)', level: 'Expert', category: 'General' },
+      { name: 'Safety Engineering', level: 'Advanced', category: 'General' },
+      { name: 'Risk Management', level: 'Advanced', category: 'General' },
+      { name: 'Incident Investigation', level: 'Advanced', category: 'General' },
+      { name: 'Regulatory Compliance', level: 'Intermediate', category: 'General' },
+    ],
+    'health & safety advisor': [
+      { name: 'Safety (WHS)', level: 'Advanced', category: 'General' },
+      { name: 'Safety Engineering', level: 'Intermediate', category: 'General' },
+      { name: 'Risk Management', level: 'Intermediate', category: 'General' },
+      { name: 'Incident Investigation', level: 'Intermediate', category: 'General' },
+      { name: 'Regulatory Compliance', level: 'Intermediate', category: 'General' },
+    ],
+    'health & safety officer': [
+      { name: 'Safety (WHS)', level: 'Intermediate', category: 'General' },
+      { name: 'Risk Management', level: 'Intermediate', category: 'General' },
+      { name: 'Incident Investigation', level: 'Intermediate', category: 'General' },
+      { name: 'Reporting', level: 'Intermediate', category: 'Analytics' },
+    ],
+    'hse advisor': [
+      { name: 'Safety (WHS)', level: 'Advanced', category: 'General' },
+      { name: 'Safety Engineering', level: 'Intermediate', category: 'General' },
+      { name: 'Risk Management', level: 'Intermediate', category: 'General' },
+      { name: 'Incident Investigation', level: 'Advanced', category: 'General' },
+    ],
+
+    // ── FINANCE ──────────────────────────────────────────────────────────
+    'corporate finance manager': [
+      { name: 'Corporate Finance', level: 'Expert', category: 'Analytics' },
+      { name: 'Financial Modelling', level: 'Expert', category: 'Analytics' },
+      { name: 'Treasury', level: 'Advanced', category: 'General' },
+      { name: 'Financial Reporting', level: 'Advanced', category: 'Analytics' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Budget Management', level: 'Advanced', category: 'General' },
+      { name: 'Risk Management', level: 'Intermediate', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+    ],
+    'corporate finance analyst': [
+      { name: 'Corporate Finance', level: 'Advanced', category: 'Analytics' },
+      { name: 'Financial Modelling', level: 'Advanced', category: 'Analytics' },
+      { name: 'Financial Reporting', level: 'Advanced', category: 'Analytics' },
+      { name: 'Data Analysis', level: 'Advanced', category: 'Analytics' },
+      { name: 'Excel (Advanced)', level: 'Expert', category: 'Analytics' },
+      { name: 'Treasury', level: 'Intermediate', category: 'General' },
+    ],
+    'finance business partner': [
+      { name: 'Financial Analysis', level: 'Advanced', category: 'Analytics' },
+      { name: 'Financial Modelling', level: 'Advanced', category: 'Analytics' },
+      { name: 'Business Partnering', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Budget Management', level: 'Advanced', category: 'General' },
+      { name: 'Reporting', level: 'Advanced', category: 'Analytics' },
+      { name: 'Excel (Advanced)', level: 'Advanced', category: 'Analytics' },
+    ],
+    'financial accounting specialist': [
+      { name: 'Financial Reporting', level: 'Expert', category: 'Analytics' },
+      { name: 'Financial Accounting', level: 'Expert', category: 'Analytics' },
+      { name: 'Regulatory Reporting', level: 'Advanced', category: 'Analytics' },
+      { name: 'Excel (Advanced)', level: 'Advanced', category: 'Analytics' },
+      { name: 'SAP', level: 'Intermediate', category: 'General' },
+      { name: 'Tax Compliance', level: 'Intermediate', category: 'General' },
+    ],
+    'financial accountant': [
+      { name: 'Financial Accounting', level: 'Advanced', category: 'Analytics' },
+      { name: 'Financial Reporting', level: 'Advanced', category: 'Analytics' },
+      { name: 'Tax Compliance', level: 'Intermediate', category: 'General' },
+      { name: 'Excel (Advanced)', level: 'Advanced', category: 'Analytics' },
+      { name: 'SAP', level: 'Intermediate', category: 'General' },
+    ],
+    'management accounting specialist': [
+      { name: 'Management Accounting', level: 'Expert', category: 'Analytics' },
+      { name: 'Cost Analysis', level: 'Advanced', category: 'Analytics' },
+      { name: 'Budget Management', level: 'Advanced', category: 'General' },
+      { name: 'Forecasting', level: 'Advanced', category: 'Analytics' },
+      { name: 'Financial Reporting', level: 'Advanced', category: 'Analytics' },
+      { name: 'SAP', level: 'Intermediate', category: 'General' },
+    ],
+    'management accountant': [
+      { name: 'Management Accounting', level: 'Advanced', category: 'Analytics' },
+      { name: 'Cost Analysis', level: 'Advanced', category: 'Analytics' },
+      { name: 'Budget Management', level: 'Intermediate', category: 'General' },
+      { name: 'Forecasting', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Financial Reporting', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Excel (Advanced)', level: 'Advanced', category: 'Analytics' },
+    ],
+    'finance analyst': [
+      { name: 'Financial Analysis', level: 'Advanced', category: 'Analytics' },
+      { name: 'Financial Modelling', level: 'Advanced', category: 'Analytics' },
+      { name: 'Financial Reporting', level: 'Advanced', category: 'Analytics' },
+      { name: 'Data Analysis', level: 'Advanced', category: 'Analytics' },
+      { name: 'Excel (Advanced)', level: 'Expert', category: 'Analytics' },
+      { name: 'Budget Management', level: 'Intermediate', category: 'General' },
+      { name: 'Forecasting', level: 'Intermediate', category: 'Analytics' },
+    ],
+    'financial analyst': [
+      { name: 'Financial Analysis', level: 'Advanced', category: 'Analytics' },
+      { name: 'Financial Modelling', level: 'Advanced', category: 'Analytics' },
+      { name: 'Financial Reporting', level: 'Advanced', category: 'Analytics' },
+      { name: 'Data Analysis', level: 'Advanced', category: 'Analytics' },
+      { name: 'Excel (Advanced)', level: 'Expert', category: 'Analytics' },
+      { name: 'Budget Management', level: 'Intermediate', category: 'General' },
+      { name: 'Cost Benefit Analysis', level: 'Intermediate', category: 'Analytics' },
+    ],
+    'finance officer - accounts payable': [
+      { name: 'Accounts Payable', level: 'Expert', category: 'General' },
+      { name: 'SAP', level: 'Intermediate', category: 'General' },
+      { name: 'Excel (Advanced)', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Financial Reporting', level: 'Beginner', category: 'Analytics' },
+    ],
+    'finance and tax accountant': [
+      { name: 'Tax Compliance', level: 'Expert', category: 'General' },
+      { name: 'Financial Accounting', level: 'Advanced', category: 'Analytics' },
+      { name: 'Financial Reporting', level: 'Advanced', category: 'Analytics' },
+      { name: 'Regulatory Reporting', level: 'Advanced', category: 'Analytics' },
+      { name: 'SAP', level: 'Intermediate', category: 'General' },
+      { name: 'Excel (Advanced)', level: 'Advanced', category: 'Analytics' },
+    ],
+    'insurance specialist': [
+      { name: 'Insurance Management', level: 'Expert', category: 'General' },
+      { name: 'Risk Management', level: 'Advanced', category: 'General' },
+      { name: 'Contract Administration', level: 'Intermediate', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Intermediate', category: 'Management' },
+      { name: 'Reporting', level: 'Intermediate', category: 'Analytics' },
+    ],
+    'payroll lead': [
+      { name: 'Payroll Management', level: 'Expert', category: 'General' },
+      { name: 'SAP', level: 'Advanced', category: 'General' },
+      { name: 'HRIS', level: 'Advanced', category: 'General' },
+      { name: 'Leadership', level: 'Intermediate', category: 'Management' },
+      { name: 'Regulatory Compliance', level: 'Advanced', category: 'General' },
+    ],
+    'payroll officer': [
+      { name: 'Payroll Management', level: 'Advanced', category: 'General' },
+      { name: 'SAP', level: 'Intermediate', category: 'General' },
+      { name: 'HRIS', level: 'Intermediate', category: 'General' },
+      { name: 'Excel (Advanced)', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Regulatory Compliance', level: 'Intermediate', category: 'General' },
+    ],
+    'accountant': [
+      { name: 'Financial Accounting', level: 'Advanced', category: 'Analytics' },
+      { name: 'Financial Reporting', level: 'Advanced', category: 'Analytics' },
+      { name: 'Tax Compliance', level: 'Intermediate', category: 'General' },
+      { name: 'Excel (Advanced)', level: 'Advanced', category: 'Analytics' },
+      { name: 'SAP', level: 'Intermediate', category: 'General' },
+    ],
+
+    // ── STRATEGY & ANALYTICS ─────────────────────────────────────────────
+    'analytics specialist': [
+      { name: 'Data Analysis', level: 'Expert', category: 'Analytics' },
+      { name: 'Python', level: 'Advanced', category: 'Programming' },
+      { name: 'SQL', level: 'Advanced', category: 'Analytics' },
+      { name: 'Machine Learning', level: 'Advanced', category: 'Analytics' },
+      { name: 'Power BI', level: 'Advanced', category: 'Analytics' },
+      { name: 'Data Visualisation', level: 'Advanced', category: 'Analytics' },
+      { name: 'Statistical Analysis', level: 'Advanced', category: 'Analytics' },
+    ],
+    'strategy analyst': [
+      { name: 'Strategic Planning', level: 'Advanced', category: 'Strategy' },
+      { name: 'Business Case Development', level: 'Advanced', category: 'General' },
+      { name: 'Research', level: 'Advanced', category: 'Research' },
+      { name: 'Data Analysis', level: 'Advanced', category: 'Analytics' },
+      { name: 'Financial Modelling', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Stakeholder Engagement', level: 'Intermediate', category: 'Management' },
+      { name: 'Scenario Planning', level: 'Intermediate', category: 'Strategy' },
+    ],
+    'portfolio analyst': [
+      { name: 'Portfolio Management', level: 'Advanced', category: 'Management' },
+      { name: 'Data Analysis', level: 'Advanced', category: 'Analytics' },
+      { name: 'Financial Modelling', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Reporting', level: 'Advanced', category: 'Analytics' },
+      { name: 'Excel (Advanced)', level: 'Advanced', category: 'Analytics' },
+    ],
+    'origination manager': [
+      { name: 'Business Development', level: 'Advanced', category: 'Strategy' },
+      { name: 'Power Purchase Agreements', level: 'Advanced', category: 'General' },
+      { name: 'Renewable Energy', level: 'Advanced', category: 'General' },
+      { name: 'Commercial Management', level: 'Advanced', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Financial Modelling', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Leadership', level: 'Intermediate', category: 'Management' },
+    ],
+    'new venture manager': [
+      { name: 'Business Development', level: 'Advanced', category: 'Strategy' },
+      { name: 'Strategic Planning', level: 'Advanced', category: 'Strategy' },
+      { name: 'Innovation', level: 'Advanced', category: 'Strategy' },
+      { name: 'Financial Modelling', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Market Research', level: 'Intermediate', category: 'Research' },
+    ],
+    'engagement & planning specialist': [
+      { name: 'Strategic Planning', level: 'Advanced', category: 'Strategy' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Communication', level: 'Advanced', category: 'Management' },
+      { name: 'Research', level: 'Intermediate', category: 'Research' },
+      { name: 'Data Analysis', level: 'Intermediate', category: 'Analytics' },
+    ],
+    'business analyst': [
+      { name: 'Business Analysis', level: 'Advanced', category: 'Analytics' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Process Improvement', level: 'Advanced', category: 'Management' },
+      { name: 'Requirements Management', level: 'Advanced', category: 'Analytics' },
+      { name: 'Data Analysis', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Excel (Advanced)', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Business Case Development', level: 'Intermediate', category: 'General' },
+    ],
+    'data analyst': [
+      { name: 'Data Analysis', level: 'Advanced', category: 'Analytics' },
+      { name: 'SQL', level: 'Advanced', category: 'Analytics' },
+      { name: 'Python', level: 'Intermediate', category: 'Programming' },
+      { name: 'Excel (Advanced)', level: 'Advanced', category: 'Analytics' },
+      { name: 'Data Visualisation', level: 'Advanced', category: 'Analytics' },
+      { name: 'Power BI', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Forecasting', level: 'Intermediate', category: 'Analytics' },
+    ],
+    'information management specialist': [
+      { name: 'Information Management', level: 'Expert', category: 'General' },
+      { name: 'Document Control', level: 'Expert', category: 'General' },
+      { name: 'Records Management', level: 'Expert', category: 'General' },
+      { name: 'Governance', level: 'Intermediate', category: 'Management' },
+      { name: 'SharePoint', level: 'Advanced', category: 'General' },
+    ],
+    'information management': [
+      { name: 'Information Management', level: 'Advanced', category: 'General' },
+      { name: 'Document Control', level: 'Advanced', category: 'General' },
+      { name: 'Records Management', level: 'Advanced', category: 'General' },
+      { name: 'Governance', level: 'Intermediate', category: 'Management' },
+    ],
+
+    // ── ICT & DIGITAL ────────────────────────────────────────────────────
+    'enterprise applications lead': [
+      { name: 'Enterprise Applications', level: 'Expert', category: 'General' },
+      { name: 'SAP', level: 'Advanced', category: 'General' },
+      { name: 'System Integration', level: 'Advanced', category: 'General' },
+      { name: 'Business Analysis', level: 'Advanced', category: 'Analytics' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'IT Delivery', level: 'Advanced', category: 'Management' },
+    ],
+    'enterprise information & analytics manager': [
+      { name: 'Data & Analytics', level: 'Expert', category: 'Analytics' },
+      { name: 'Data Governance', level: 'Expert', category: 'General' },
+      { name: 'Enterprise Applications', level: 'Advanced', category: 'General' },
+      { name: 'Power BI', level: 'Advanced', category: 'Analytics' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+    ],
+    'ict operations manager': [
+      { name: 'IT Operations', level: 'Expert', category: 'Management' },
+      { name: 'ITSM', level: 'Expert', category: 'Management' },
+      { name: 'Service Delivery', level: 'Advanced', category: 'Management' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Vendor Management', level: 'Advanced', category: 'Management' },
+      { name: 'Cybersecurity', level: 'Intermediate', category: 'General' },
+      { name: 'Budget Management', level: 'Advanced', category: 'General' },
+    ],
+    'ict project manager': [
+      { name: 'IT Delivery', level: 'Advanced', category: 'Management' },
+      { name: 'Project Management', level: 'Advanced', category: 'Management' },
+      { name: 'Agile / Scrum', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Risk & Issues Management', level: 'Advanced', category: 'Management' },
+      { name: 'Budget Management', level: 'Intermediate', category: 'General' },
+    ],
+    'ict project management office lead': [
+      { name: 'PMO', level: 'Expert', category: 'Management' },
+      { name: 'IT Delivery', level: 'Advanced', category: 'Management' },
+      { name: 'Governance', level: 'Expert', category: 'Management' },
+      { name: 'Reporting', level: 'Advanced', category: 'Analytics' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Risk & Issues Management', level: 'Advanced', category: 'Management' },
+    ],
+    'ict project delivery manager': [
+      { name: 'IT Delivery', level: 'Advanced', category: 'Management' },
+      { name: 'Project Management', level: 'Advanced', category: 'Management' },
+      { name: 'Governance', level: 'Advanced', category: 'Management' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+    ],
+    'ict business analyst': [
+      { name: 'Business Analysis', level: 'Advanced', category: 'Analytics' },
+      { name: 'Requirements Management', level: 'Advanced', category: 'Analytics' },
+      { name: 'IT Delivery', level: 'Intermediate', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Process Improvement', level: 'Intermediate', category: 'Management' },
+      { name: 'SAP', level: 'Intermediate', category: 'General' },
+    ],
+    'ict service delivery lead': [
+      { name: 'ITSM', level: 'Advanced', category: 'Management' },
+      { name: 'Service Delivery', level: 'Expert', category: 'Management' },
+      { name: 'Vendor Management', level: 'Intermediate', category: 'Management' },
+      { name: 'Customer Service', level: 'Advanced', category: 'General' },
+      { name: 'Process Improvement', level: 'Intermediate', category: 'Management' },
+      { name: 'Leadership', level: 'Intermediate', category: 'Management' },
+    ],
+    'service management lead': [
+      { name: 'ITSM', level: 'Expert', category: 'Management' },
+      { name: 'Service Delivery', level: 'Expert', category: 'Management' },
+      { name: 'Process Improvement', level: 'Advanced', category: 'Management' },
+      { name: 'Vendor Management', level: 'Advanced', category: 'Management' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+    ],
+    'application': [
+      { name: 'Enterprise Applications', level: 'Advanced', category: 'General' },
+      { name: 'SAP', level: 'Advanced', category: 'General' },
+      { name: 'Business Analysis', level: 'Intermediate', category: 'Analytics' },
+      { name: 'System Integration', level: 'Intermediate', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Intermediate', category: 'Management' },
+    ],
+    'lead solution architect': [
+      { name: 'Solution Architecture', level: 'Expert', category: 'Architecture' },
+      { name: 'Enterprise Architecture', level: 'Expert', category: 'Architecture' },
+      { name: 'System Integration', level: 'Expert', category: 'General' },
+      { name: 'Cloud (AWS)', level: 'Advanced', category: 'Cloud' },
+      { name: 'Technology Strategy', level: 'Advanced', category: 'Strategy' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+    ],
+    'solution architect': [
+      { name: 'Solution Architecture', level: 'Expert', category: 'Architecture' },
+      { name: 'System Integration', level: 'Advanced', category: 'General' },
+      { name: 'Cloud (AWS)', level: 'Advanced', category: 'Cloud' },
+      { name: 'Technology Strategy', level: 'Advanced', category: 'Strategy' },
+      { name: 'API Integration', level: 'Advanced', category: 'Programming' },
+      { name: 'Enterprise Applications', level: 'Intermediate', category: 'General' },
+    ],
+    'domain architect': [
+      { name: 'Enterprise Architecture', level: 'Expert', category: 'Architecture' },
+      { name: 'Solution Architecture', level: 'Advanced', category: 'Architecture' },
+      { name: 'Technology Strategy', level: 'Advanced', category: 'Strategy' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'System Integration', level: 'Advanced', category: 'General' },
+    ],
+    'cloud data engineer': [
+      { name: 'Cloud (AWS)', level: 'Advanced', category: 'Cloud' },
+      { name: 'Data Engineering', level: 'Advanced', category: 'Analytics' },
+      { name: 'Python', level: 'Advanced', category: 'Programming' },
+      { name: 'SQL', level: 'Advanced', category: 'Analytics' },
+      { name: 'ETL / Data Pipelines', level: 'Advanced', category: 'Analytics' },
+      { name: 'Big Data', level: 'Intermediate', category: 'Analytics' },
+    ],
+    'cloud ml engineer': [
+      { name: 'Machine Learning', level: 'Expert', category: 'Analytics' },
+      { name: 'Cloud (AWS)', level: 'Advanced', category: 'Cloud' },
+      { name: 'Python', level: 'Expert', category: 'Programming' },
+      { name: 'Data Engineering', level: 'Advanced', category: 'Analytics' },
+      { name: 'MLOps', level: 'Advanced', category: 'Analytics' },
+      { name: 'SQL', level: 'Intermediate', category: 'Analytics' },
+    ],
+    'cloud systems engineer': [
+      { name: 'Cloud (AWS)', level: 'Expert', category: 'Cloud' },
+      { name: 'DevOps', level: 'Advanced', category: 'DevOps' },
+      { name: 'Infrastructure as Code', level: 'Advanced', category: 'DevOps' },
+      { name: 'Linux Administration', level: 'Advanced', category: 'General' },
+      { name: 'Network Administration', level: 'Advanced', category: 'General' },
+      { name: 'Security', level: 'Intermediate', category: 'General' },
+    ],
+    'cyber security architect': [
+      { name: 'Cybersecurity', level: 'Expert', category: 'General' },
+      { name: 'Security Architecture', level: 'Expert', category: 'Architecture' },
+      { name: 'Risk Management', level: 'Advanced', category: 'General' },
+      { name: 'Cloud Security', level: 'Advanced', category: 'Cloud' },
+      { name: 'Threat Modelling', level: 'Advanced', category: 'General' },
+      { name: 'Regulatory Compliance', level: 'Advanced', category: 'General' },
+    ],
+    'security analyst': [
+      { name: 'Cybersecurity', level: 'Advanced', category: 'General' },
+      { name: 'Security Analysis', level: 'Advanced', category: 'General' },
+      { name: 'Threat Detection', level: 'Advanced', category: 'General' },
+      { name: 'Incident Response', level: 'Advanced', category: 'General' },
+      { name: 'SIEM', level: 'Intermediate', category: 'General' },
+      { name: 'Risk Management', level: 'Intermediate', category: 'General' },
+    ],
+    'security engineer': [
+      { name: 'Cybersecurity', level: 'Advanced', category: 'General' },
+      { name: 'Security Engineering', level: 'Expert', category: 'General' },
+      { name: 'Penetration Testing', level: 'Intermediate', category: 'General' },
+      { name: 'Network Security', level: 'Advanced', category: 'General' },
+      { name: 'Incident Response', level: 'Advanced', category: 'General' },
+    ],
+    'ict risk and security manager': [
+      { name: 'Cybersecurity', level: 'Advanced', category: 'General' },
+      { name: 'IT Risk Management', level: 'Expert', category: 'Management' },
+      { name: 'Security Architecture', level: 'Advanced', category: 'Architecture' },
+      { name: 'Governance', level: 'Advanced', category: 'Management' },
+      { name: 'Regulatory Compliance', level: 'Advanced', category: 'General' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+    ],
+    'information security manager': [
+      { name: 'Cybersecurity', level: 'Expert', category: 'General' },
+      { name: 'IT Risk Management', level: 'Expert', category: 'Management' },
+      { name: 'Security Architecture', level: 'Advanced', category: 'Architecture' },
+      { name: 'Governance', level: 'Advanced', category: 'Management' },
+      { name: 'Regulatory Compliance', level: 'Advanced', category: 'General' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+    ],
+    'sap reporting specialist': [
+      { name: 'SAP', level: 'Expert', category: 'General' },
+      { name: 'SAP Reporting', level: 'Expert', category: 'Analytics' },
+      { name: 'Data Analysis', level: 'Advanced', category: 'Analytics' },
+      { name: 'Financial Reporting', level: 'Advanced', category: 'Analytics' },
+      { name: 'Business Analysis', level: 'Intermediate', category: 'Analytics' },
+    ],
+    'sap solution architect': [
+      { name: 'SAP', level: 'Expert', category: 'General' },
+      { name: 'Solution Architecture', level: 'Expert', category: 'Architecture' },
+      { name: 'System Integration', level: 'Advanced', category: 'General' },
+      { name: 'Business Process Management', level: 'Advanced', category: 'Management' },
+      { name: 'Enterprise Architecture', level: 'Advanced', category: 'Architecture' },
+    ],
+    'full stack developer': [
+      { name: 'Software Development', level: 'Advanced', category: 'Programming' },
+      { name: 'JavaScript', level: 'Advanced', category: 'Programming' },
+      { name: 'React', level: 'Advanced', category: 'Programming' },
+      { name: 'API Integration', level: 'Advanced', category: 'Programming' },
+      { name: 'SQL', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Cloud (AWS)', level: 'Intermediate', category: 'Cloud' },
+      { name: 'Agile / Scrum', level: 'Intermediate', category: 'Management' },
+    ],
+    'data & analytics lead': [
+      { name: 'Data & Analytics', level: 'Expert', category: 'Analytics' },
+      { name: 'Data Governance', level: 'Advanced', category: 'General' },
+      { name: 'Power BI', level: 'Advanced', category: 'Analytics' },
+      { name: 'SQL', level: 'Advanced', category: 'Analytics' },
+      { name: 'Python', level: 'Advanced', category: 'Programming' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+    ],
+    'service now': [
+      { name: 'ServiceNow', level: 'Expert', category: 'General' },
+      { name: 'ITSM', level: 'Advanced', category: 'Management' },
+      { name: 'System Administration', level: 'Advanced', category: 'General' },
+      { name: 'Process Improvement', level: 'Intermediate', category: 'Management' },
+    ],
+    'platforms lead': [
+      { name: 'Enterprise Applications', level: 'Advanced', category: 'General' },
+      { name: 'Cloud (AWS)', level: 'Advanced', category: 'Cloud' },
+      { name: 'Solution Architecture', level: 'Advanced', category: 'Architecture' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+    ],
+    'infrastructure lead': [
+      { name: 'IT Infrastructure', level: 'Expert', category: 'General' },
+      { name: 'Cloud (AWS)', level: 'Advanced', category: 'Cloud' },
+      { name: 'Network Administration', level: 'Advanced', category: 'General' },
+      { name: 'DevOps', level: 'Intermediate', category: 'DevOps' },
+      { name: 'Leadership', level: 'Intermediate', category: 'Management' },
+    ],
+    'iteration manager': [
+      { name: 'Agile / Scrum', level: 'Expert', category: 'Management' },
+      { name: 'IT Delivery', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Facilitation', level: 'Advanced', category: 'Management' },
+      { name: 'Continuous Improvement', level: 'Advanced', category: 'Management' },
+    ],
+    'technical lead': [
+      { name: 'Software Development', level: 'Expert', category: 'Programming' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Solution Architecture', level: 'Intermediate', category: 'Architecture' },
+      { name: 'Mentoring', level: 'Advanced', category: 'Management' },
+      { name: 'Agile / Scrum', level: 'Advanced', category: 'Management' },
+    ],
+    'strategy, engagement & architecture': [
+      { name: 'Technology Strategy', level: 'Expert', category: 'Strategy' },
+      { name: 'Enterprise Architecture', level: 'Expert', category: 'Architecture' },
+      { name: 'Stakeholder Engagement', level: 'Expert', category: 'Management' },
+      { name: 'Digital Transformation', level: 'Advanced', category: 'Strategy' },
+      { name: 'Strategic Planning', level: 'Advanced', category: 'Strategy' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+    ],
+
+    // ── PROCUREMENT & SUPPLY CHAIN ───────────────────────────────────────
+    'strategic sourcing and procurement manager': [
+      { name: 'Strategic Sourcing', level: 'Expert', category: 'General' },
+      { name: 'Procurement', level: 'Expert', category: 'General' },
+      { name: 'Category Management', level: 'Expert', category: 'General' },
+      { name: 'Contract Negotiation', level: 'Advanced', category: 'General' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Supplier Management', level: 'Advanced', category: 'General' },
+      { name: 'SAP', level: 'Intermediate', category: 'General' },
+    ],
+    'category lead': [
+      { name: 'Category Management', level: 'Expert', category: 'General' },
+      { name: 'Procurement', level: 'Advanced', category: 'General' },
+      { name: 'Strategic Sourcing', level: 'Advanced', category: 'General' },
+      { name: 'Contract Negotiation', level: 'Advanced', category: 'General' },
+      { name: 'Supplier Management', level: 'Advanced', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+    ],
+    'procurement specialist': [
+      { name: 'Procurement', level: 'Advanced', category: 'General' },
+      { name: 'Contract Administration', level: 'Advanced', category: 'General' },
+      { name: 'Supplier Management', level: 'Advanced', category: 'General' },
+      { name: 'SAP', level: 'Intermediate', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Intermediate', category: 'Management' },
+      { name: 'Negotiation', level: 'Intermediate', category: 'General' },
+    ],
+    'procurement advisor': [
+      { name: 'Procurement', level: 'Advanced', category: 'General' },
+      { name: 'Contract Administration', level: 'Intermediate', category: 'General' },
+      { name: 'Supplier Management', level: 'Intermediate', category: 'General' },
+      { name: 'SAP', level: 'Intermediate', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Intermediate', category: 'Management' },
+    ],
+    'procurement officer': [
+      { name: 'Procurement', level: 'Intermediate', category: 'General' },
+      { name: 'Contract Administration', level: 'Intermediate', category: 'General' },
+      { name: 'SAP', level: 'Intermediate', category: 'General' },
+      { name: 'Supplier Management', level: 'Beginner', category: 'General' },
+    ],
+    'warehousing & procurement': [
+      { name: 'Procurement', level: 'Advanced', category: 'General' },
+      { name: 'Warehousing & Logistics', level: 'Advanced', category: 'General' },
+      { name: 'Inventory Management', level: 'Advanced', category: 'General' },
+      { name: 'SAP', level: 'Intermediate', category: 'General' },
+      { name: 'Supplier Management', level: 'Intermediate', category: 'General' },
+    ],
+
+    // ── LEGAL & GOVERNANCE ───────────────────────────────────────────────
+    'senior legal counsel': [
+      { name: 'Legal Advice', level: 'Expert', category: 'General' },
+      { name: 'Contract Law', level: 'Expert', category: 'General' },
+      { name: 'Commercial Law', level: 'Expert', category: 'General' },
+      { name: 'Negotiation', level: 'Advanced', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Risk Management', level: 'Advanced', category: 'General' },
+    ],
+    'legal counsel': [
+      { name: 'Legal Advice', level: 'Advanced', category: 'General' },
+      { name: 'Contract Law', level: 'Advanced', category: 'General' },
+      { name: 'Commercial Law', level: 'Advanced', category: 'General' },
+      { name: 'Negotiation', level: 'Intermediate', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Intermediate', category: 'Management' },
+      { name: 'Regulatory Compliance', level: 'Advanced', category: 'General' },
+    ],
+    'legal specialist - gas and renewables': [
+      { name: 'Legal Advice', level: 'Advanced', category: 'General' },
+      { name: 'Energy Law', level: 'Expert', category: 'General' },
+      { name: 'Contract Law', level: 'Advanced', category: 'General' },
+      { name: 'Renewable Energy', level: 'Intermediate', category: 'General' },
+      { name: 'Negotiation', level: 'Advanced', category: 'General' },
+    ],
+    'legal specialist': [
+      { name: 'Legal Advice', level: 'Advanced', category: 'General' },
+      { name: 'Contract Law', level: 'Advanced', category: 'General' },
+      { name: 'Negotiation', level: 'Intermediate', category: 'General' },
+      { name: 'Regulatory Compliance', level: 'Intermediate', category: 'General' },
+    ],
+    'legal & governance manager': [
+      { name: 'Legal Advice', level: 'Advanced', category: 'General' },
+      { name: 'Corporate Governance', level: 'Expert', category: 'Management' },
+      { name: 'Compliance Management', level: 'Advanced', category: 'Management' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Risk Management', level: 'Advanced', category: 'General' },
+    ],
+    'compliance advisor': [
+      { name: 'Compliance Management', level: 'Advanced', category: 'Management' },
+      { name: 'Regulatory Compliance', level: 'Advanced', category: 'General' },
+      { name: 'Risk Management', level: 'Advanced', category: 'General' },
+      { name: 'Governance', level: 'Intermediate', category: 'Management' },
+      { name: 'Policy Analysis', level: 'Intermediate', category: 'Strategy' },
+      { name: 'Research', level: 'Intermediate', category: 'Research' },
+    ],
+    'internal audit and compliance manager': [
+      { name: 'Internal Audit', level: 'Expert', category: 'Management' },
+      { name: 'Compliance Management', level: 'Expert', category: 'Management' },
+      { name: 'Risk Management', level: 'Advanced', category: 'General' },
+      { name: 'Governance', level: 'Advanced', category: 'Management' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Reporting', level: 'Advanced', category: 'Analytics' },
+    ],
+    'risk & resilience manager': [
+      { name: 'Risk Management', level: 'Expert', category: 'General' },
+      { name: 'Business Continuity', level: 'Expert', category: 'General' },
+      { name: 'Emergency Management', level: 'Advanced', category: 'General' },
+      { name: 'Governance', level: 'Advanced', category: 'Management' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+    ],
+    'risk & resilience advisor': [
+      { name: 'Risk Management', level: 'Advanced', category: 'General' },
+      { name: 'Business Continuity', level: 'Advanced', category: 'General' },
+      { name: 'Emergency Management', level: 'Intermediate', category: 'General' },
+      { name: 'Governance', level: 'Intermediate', category: 'Management' },
+      { name: 'Research', level: 'Intermediate', category: 'Research' },
+    ],
+    'risk & resilience specialist': [
+      { name: 'Risk Management', level: 'Advanced', category: 'General' },
+      { name: 'Business Continuity', level: 'Advanced', category: 'General' },
+      { name: 'Emergency Management', level: 'Advanced', category: 'General' },
+      { name: 'Risk Assessment', level: 'Advanced', category: 'General' },
+    ],
+    'risk advisor': [
+      { name: 'Risk Management', level: 'Advanced', category: 'General' },
+      { name: 'Risk Assessment', level: 'Advanced', category: 'General' },
+      { name: 'Governance', level: 'Intermediate', category: 'Management' },
+      { name: 'Reporting', level: 'Intermediate', category: 'Analytics' },
+    ],
+    'property specialist': [
+      { name: 'Property Management', level: 'Advanced', category: 'General' },
+      { name: 'Commercial Law', level: 'Intermediate', category: 'General' },
+      { name: 'Leasing', level: 'Advanced', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Intermediate', category: 'Management' },
+      { name: 'Contract Administration', level: 'Intermediate', category: 'General' },
+    ],
+    'assistant company secretary': [
+      { name: 'Corporate Governance', level: 'Advanced', category: 'Management' },
+      { name: 'Company Secretarial', level: 'Advanced', category: 'Management' },
+      { name: 'Regulatory Compliance', level: 'Advanced', category: 'General' },
+      { name: 'Board Reporting', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Intermediate', category: 'Management' },
+    ],
+    'governance & vendor management': [
+      { name: 'Governance', level: 'Expert', category: 'Management' },
+      { name: 'Vendor Management', level: 'Expert', category: 'Management' },
+      { name: 'Contract Administration', level: 'Advanced', category: 'General' },
+      { name: 'Supplier Management', level: 'Advanced', category: 'General' },
+      { name: 'Reporting', level: 'Intermediate', category: 'Analytics' },
+    ],
+
+    // ── PEOPLE & CULTURE ─────────────────────────────────────────────────
+    'employee experience manager': [
+      { name: 'Employee Experience', level: 'Expert', category: 'Management' },
+      { name: 'HR Strategy', level: 'Advanced', category: 'Management' },
+      { name: 'Culture & Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Change Management', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Data Analysis', level: 'Intermediate', category: 'Analytics' },
+    ],
+    'employee relations manager': [
+      { name: 'Employee Relations', level: 'Expert', category: 'Management' },
+      { name: 'Industrial Relations', level: 'Expert', category: 'Management' },
+      { name: 'Workplace Relations', level: 'Expert', category: 'Management' },
+      { name: 'Negotiation', level: 'Advanced', category: 'General' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+    ],
+    'employee relations partner': [
+      { name: 'Employee Relations', level: 'Advanced', category: 'Management' },
+      { name: 'Industrial Relations', level: 'Advanced', category: 'Management' },
+      { name: 'Workplace Relations', level: 'Advanced', category: 'Management' },
+      { name: 'Negotiation', level: 'Intermediate', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+    ],
+    'industrial relations specialist': [
+      { name: 'Industrial Relations', level: 'Expert', category: 'Management' },
+      { name: 'Employee Relations', level: 'Advanced', category: 'Management' },
+      { name: 'Workplace Relations', level: 'Advanced', category: 'Management' },
+      { name: 'Negotiation', level: 'Advanced', category: 'General' },
+      { name: 'Legal Advice', level: 'Intermediate', category: 'General' },
+    ],
+    'workplace relations manager': [
+      { name: 'Workplace Relations', level: 'Expert', category: 'Management' },
+      { name: 'Industrial Relations', level: 'Expert', category: 'Management' },
+      { name: 'Employee Relations', level: 'Advanced', category: 'Management' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Negotiation', level: 'Advanced', category: 'General' },
+    ],
+    'diversity, equity, inclusion': [
+      { name: 'Diversity & Inclusion', level: 'Expert', category: 'Management' },
+      { name: 'Culture & Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'HR Strategy', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Training & Facilitation', level: 'Advanced', category: 'Management' },
+      { name: 'Data Analysis', level: 'Intermediate', category: 'Analytics' },
+    ],
+    'organisational capability manager': [
+      { name: 'Organisational Capability', level: 'Expert', category: 'Management' },
+      { name: 'Learning & Development', level: 'Expert', category: 'Management' },
+      { name: 'Workforce Planning', level: 'Advanced', category: 'Management' },
+      { name: 'Talent Development', level: 'Advanced', category: 'Management' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+    ],
+    'organisational capability coordinator': [
+      { name: 'Organisational Capability', level: 'Intermediate', category: 'Management' },
+      { name: 'Learning & Development', level: 'Intermediate', category: 'Management' },
+      { name: 'Training Coordination', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Intermediate', category: 'Management' },
+      { name: 'Communication', level: 'Advanced', category: 'Management' },
+    ],
+    'organisational effectiveness specialist': [
+      { name: 'Organisational Development', level: 'Expert', category: 'Management' },
+      { name: 'Change Management', level: 'Advanced', category: 'Management' },
+      { name: 'Data Analysis', level: 'Advanced', category: 'Analytics' },
+      { name: 'Workforce Planning', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+    ],
+    'people & culture services manager': [
+      { name: 'HR Operations', level: 'Expert', category: 'Management' },
+      { name: 'HRIS', level: 'Advanced', category: 'General' },
+      { name: 'HR Strategy', level: 'Advanced', category: 'Management' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Process Improvement', level: 'Intermediate', category: 'Management' },
+    ],
+    'people & culture business partner': [
+      { name: 'HR Business Partnering', level: 'Advanced', category: 'Management' },
+      { name: 'Employee Relations', level: 'Intermediate', category: 'Management' },
+      { name: 'Talent Development', level: 'Advanced', category: 'Management' },
+      { name: 'Change Management', level: 'Intermediate', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Coaching', level: 'Intermediate', category: 'Management' },
+    ],
+    'people & culture advisor': [
+      { name: 'HR Business Partnering', level: 'Intermediate', category: 'Management' },
+      { name: 'Employee Relations', level: 'Intermediate', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Intermediate', category: 'Management' },
+      { name: 'HRIS', level: 'Intermediate', category: 'General' },
+      { name: 'Communication', level: 'Advanced', category: 'Management' },
+    ],
+    'people & culture coordinator': [
+      { name: 'HR Operations', level: 'Intermediate', category: 'Management' },
+      { name: 'HRIS', level: 'Intermediate', category: 'General' },
+      { name: 'Communication', level: 'Intermediate', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Intermediate', category: 'Management' },
+      { name: 'Document Control', level: 'Intermediate', category: 'General' },
+    ],
+    'p&c operations team lead': [
+      { name: 'HR Operations', level: 'Advanced', category: 'Management' },
+      { name: 'HRIS', level: 'Advanced', category: 'General' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Process Improvement', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+    ],
+    'remuneration advisor': [
+      { name: 'Remuneration & Benefits', level: 'Expert', category: 'Management' },
+      { name: 'Data Analysis', level: 'Advanced', category: 'Analytics' },
+      { name: 'Benchmarking', level: 'Advanced', category: 'Strategy' },
+      { name: 'HRIS', level: 'Intermediate', category: 'General' },
+      { name: 'Reporting', level: 'Intermediate', category: 'Analytics' },
+    ],
+    'remuneration analyst': [
+      { name: 'Remuneration & Benefits', level: 'Advanced', category: 'Management' },
+      { name: 'Data Analysis', level: 'Advanced', category: 'Analytics' },
+      { name: 'Benchmarking', level: 'Intermediate', category: 'Strategy' },
+      { name: 'Excel (Advanced)', level: 'Advanced', category: 'Analytics' },
+      { name: 'HRIS', level: 'Intermediate', category: 'General' },
+    ],
+    'recruitment advisor': [
+      { name: 'Talent Acquisition', level: 'Advanced', category: 'Management' },
+      { name: 'Candidate Assessment', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Employer Branding', level: 'Intermediate', category: 'Marketing' },
+      { name: 'HRIS', level: 'Intermediate', category: 'General' },
+    ],
+    'recruitment officer': [
+      { name: 'Talent Acquisition', level: 'Intermediate', category: 'Management' },
+      { name: 'Candidate Assessment', level: 'Intermediate', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Intermediate', category: 'Management' },
+      { name: 'HRIS', level: 'Intermediate', category: 'General' },
+    ],
+
+    // ── COMMUNICATIONS & REPUTATION ──────────────────────────────────────
+    'government relations manager': [
+      { name: 'Government Relations', level: 'Expert', category: 'Marketing' },
+      { name: 'Policy Analysis', level: 'Advanced', category: 'Strategy' },
+      { name: 'Stakeholder Engagement', level: 'Expert', category: 'Management' },
+      { name: 'External Communications', level: 'Advanced', category: 'Marketing' },
+      { name: 'Strategic Planning', level: 'Advanced', category: 'Strategy' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+    ],
+    'community performance specialist': [
+      { name: 'Community Engagement', level: 'Expert', category: 'Marketing' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'External Communications', level: 'Advanced', category: 'Marketing' },
+      { name: 'Social Performance', level: 'Advanced', category: 'General' },
+      { name: 'Reporting', level: 'Intermediate', category: 'Analytics' },
+    ],
+    'community performance officer': [
+      { name: 'Community Engagement', level: 'Intermediate', category: 'Marketing' },
+      { name: 'Stakeholder Engagement', level: 'Intermediate', category: 'Management' },
+      { name: 'External Communications', level: 'Intermediate', category: 'Marketing' },
+      { name: 'Reporting', level: 'Intermediate', category: 'Analytics' },
+    ],
+    'community performance manager': [
+      { name: 'Community Engagement', level: 'Expert', category: 'Marketing' },
+      { name: 'Social Performance', level: 'Expert', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Expert', category: 'Management' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'External Communications', level: 'Advanced', category: 'Marketing' },
+    ],
+    'community engagement & partnerships': [
+      { name: 'Community Engagement', level: 'Advanced', category: 'Marketing' },
+      { name: 'Partnership Development', level: 'Advanced', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'External Communications', level: 'Advanced', category: 'Marketing' },
+    ],
+    'first nations': [
+      { name: 'First Nations Engagement', level: 'Advanced', category: 'General' },
+      { name: 'Community Engagement', level: 'Advanced', category: 'Marketing' },
+      { name: 'Cultural Awareness', level: 'Expert', category: 'General' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Social Performance', level: 'Intermediate', category: 'General' },
+    ],
+    'specialist, communications and media': [
+      { name: 'Internal Communications', level: 'Advanced', category: 'Marketing' },
+      { name: 'External Communications', level: 'Advanced', category: 'Marketing' },
+      { name: 'Media Relations', level: 'Advanced', category: 'Marketing' },
+      { name: 'Content Creation', level: 'Advanced', category: 'Marketing' },
+      { name: 'Copywriting', level: 'Advanced', category: 'Marketing' },
+    ],
+    'communications and media officer': [
+      { name: 'Internal Communications', level: 'Advanced', category: 'Marketing' },
+      { name: 'External Communications', level: 'Advanced', category: 'Marketing' },
+      { name: 'Media Relations', level: 'Intermediate', category: 'Marketing' },
+      { name: 'Copywriting', level: 'Intermediate', category: 'Marketing' },
+      { name: 'Content Creation', level: 'Intermediate', category: 'Marketing' },
+    ],
+    'communications officer': [
+      { name: 'Internal Communications', level: 'Intermediate', category: 'Marketing' },
+      { name: 'External Communications', level: 'Intermediate', category: 'Marketing' },
+      { name: 'Content Creation', level: 'Intermediate', category: 'Marketing' },
+      { name: 'Copywriting', level: 'Intermediate', category: 'Marketing' },
+      { name: 'Stakeholder Engagement', level: 'Intermediate', category: 'Management' },
+    ],
+    'corporate communications specialist': [
+      { name: 'Internal Communications', level: 'Advanced', category: 'Marketing' },
+      { name: 'External Communications', level: 'Advanced', category: 'Marketing' },
+      { name: 'Brand Management', level: 'Intermediate', category: 'Marketing' },
+      { name: 'Content Creation', level: 'Advanced', category: 'Marketing' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+    ],
+    'project communications officer': [
+      { name: 'Internal Communications', level: 'Intermediate', category: 'Marketing' },
+      { name: 'Stakeholder Engagement', level: 'Intermediate', category: 'Management' },
+      { name: 'Content Creation', level: 'Intermediate', category: 'Marketing' },
+      { name: 'Community Engagement', level: 'Intermediate', category: 'Marketing' },
+      { name: 'Copywriting', level: 'Intermediate', category: 'Marketing' },
+    ],
+    'organisational change manager': [
+      { name: 'Change Management', level: 'Expert', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Communication', level: 'Advanced', category: 'Management' },
+      { name: 'Training & Facilitation', level: 'Advanced', category: 'Management' },
+      { name: 'Organisational Development', level: 'Advanced', category: 'Management' },
+    ],
+    'change manager': [
+      { name: 'Change Management', level: 'Expert', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Communication', level: 'Advanced', category: 'Management' },
+      { name: 'Training & Facilitation', level: 'Advanced', category: 'Management' },
+    ],
+    'change analyst': [
+      { name: 'Change Management', level: 'Intermediate', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Intermediate', category: 'Management' },
+      { name: 'Communication', level: 'Advanced', category: 'Management' },
+      { name: 'Data Analysis', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Reporting', level: 'Intermediate', category: 'Analytics' },
+    ],
+    'business improvement manager': [
+      { name: 'Business Improvement', level: 'Expert', category: 'Management' },
+      { name: 'Process Improvement', level: 'Expert', category: 'Management' },
+      { name: 'Lean / Six Sigma', level: 'Advanced', category: 'Management' },
+      { name: 'Change Management', level: 'Advanced', category: 'Management' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+    ],
+
+    // ── GENERAL LEADERSHIP & ADMINISTRATION ─────────────────────────────
+    'general manager': [
+      { name: 'Leadership', level: 'Expert', category: 'Management' },
+      { name: 'Strategic Planning', level: 'Advanced', category: 'Strategy' },
+      { name: 'People Management', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Budget Management', level: 'Advanced', category: 'General' },
+      { name: 'Governance', level: 'Advanced', category: 'Management' },
+      { name: 'Executive Reporting', level: 'Advanced', category: 'Management' },
+    ],
+    'executive general manager': [
+      { name: 'Leadership', level: 'Expert', category: 'Management' },
+      { name: 'Strategic Planning', level: 'Expert', category: 'Strategy' },
+      { name: 'People Management', level: 'Expert', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Expert', category: 'Management' },
+      { name: 'Budget Management', level: 'Expert', category: 'General' },
+      { name: 'Governance', level: 'Expert', category: 'Management' },
+    ],
+    'chief executive officer': [
+      { name: 'Leadership', level: 'Expert', category: 'Management' },
+      { name: 'Strategic Planning', level: 'Expert', category: 'Strategy' },
+      { name: 'Corporate Governance', level: 'Expert', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Expert', category: 'Management' },
+      { name: 'Budget Management', level: 'Expert', category: 'General' },
+      { name: 'Executive Reporting', level: 'Expert', category: 'Management' },
+    ],
+    'development director': [
+      { name: 'Business Development', level: 'Expert', category: 'Strategy' },
+      { name: 'Renewable Energy', level: 'Advanced', category: 'General' },
+      { name: 'Commercial Management', level: 'Advanced', category: 'General' },
+      { name: 'Leadership', level: 'Expert', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Financial Modelling', level: 'Advanced', category: 'Analytics' },
+      { name: 'Strategic Planning', level: 'Advanced', category: 'Strategy' },
+    ],
+    'director, retail': [
+      { name: 'Leadership', level: 'Expert', category: 'Management' },
+      { name: 'Retail Energy', level: 'Expert', category: 'General' },
+      { name: 'Commercial Management', level: 'Advanced', category: 'General' },
+      { name: 'Strategic Planning', level: 'Advanced', category: 'Strategy' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+    ],
+    'executive assistant': [
+      { name: 'Executive Support', level: 'Expert', category: 'General' },
+      { name: 'Calendar Management', level: 'Expert', category: 'General' },
+      { name: 'Communication', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Document Control', level: 'Advanced', category: 'General' },
+      { name: 'Event Management', level: 'Intermediate', category: 'General' },
+    ],
+    'receptionist': [
+      { name: 'Customer Service', level: 'Advanced', category: 'General' },
+      { name: 'Communication', level: 'Advanced', category: 'Management' },
+      { name: 'Calendar Management', level: 'Intermediate', category: 'General' },
+      { name: 'Document Control', level: 'Intermediate', category: 'General' },
+    ],
+    'site administration officer': [
+      { name: 'Administration', level: 'Advanced', category: 'General' },
+      { name: 'Document Control', level: 'Advanced', category: 'General' },
+      { name: 'Communication', level: 'Advanced', category: 'Management' },
+      { name: 'Safety (WHS)', level: 'Intermediate', category: 'General' },
+    ],
+    'grounds maintenance officer': [
+      { name: 'Grounds Maintenance', level: 'Advanced', category: 'General' },
+      { name: 'Safety (WHS)', level: 'Intermediate', category: 'General' },
+      { name: 'Asset Management', level: 'Beginner', category: 'General' },
+    ],
+    'records coordinator': [
+      { name: 'Records Management', level: 'Advanced', category: 'General' },
+      { name: 'Document Control', level: 'Advanced', category: 'General' },
+      { name: 'Information Management', level: 'Intermediate', category: 'General' },
+      { name: 'Communication', level: 'Intermediate', category: 'Management' },
+    ],
+
+    // ── GENERIC FALLBACKS (put last — these are broad keyword matches) ───
+    'operations manager': [
+      { name: 'Operations Management', level: 'Advanced', category: 'Management' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'People Management', level: 'Advanced', category: 'Management' },
+      { name: 'Budget Management', level: 'Intermediate', category: 'General' },
+      { name: 'Safety (WHS)', level: 'Intermediate', category: 'General' },
+      { name: 'Continuous Improvement', level: 'Intermediate', category: 'Management' },
+      { name: 'Risk & Issues Management', level: 'Intermediate', category: 'Management' },
+    ],
+    'finance manager': [
+      { name: 'Financial Reporting', level: 'Advanced', category: 'Analytics' },
+      { name: 'Financial Modelling', level: 'Advanced', category: 'Analytics' },
+      { name: 'Budget Management', level: 'Advanced', category: 'General' },
+      { name: 'Risk Management', level: 'Intermediate', category: 'General' },
+      { name: 'Leadership', level: 'Intermediate', category: 'Management' },
+      { name: 'Regulatory Reporting', level: 'Intermediate', category: 'Analytics' },
+    ],
+    'it manager': [
+      { name: 'IT Service Management', level: 'Advanced', category: 'Management' },
+      { name: 'Cybersecurity', level: 'Intermediate', category: 'General' },
+      { name: 'Digital Transformation', level: 'Intermediate', category: 'Strategy' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Vendor Management', level: 'Intermediate', category: 'Management' },
+      { name: 'Budget Management', level: 'Intermediate', category: 'General' },
+    ],
+    'program manager': [
+      { name: 'Program Management', level: 'Advanced', category: 'Management' },
+      { name: 'PMO', level: 'Advanced', category: 'Management' },
+      { name: 'Risk & Issues Management', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'Governance', level: 'Advanced', category: 'Management' },
+      { name: 'Budget Management', level: 'Advanced', category: 'General' },
+    ],
+    'hr business partner': [
+      { name: 'HR Business Partnering', level: 'Advanced', category: 'Management' },
+      { name: 'Talent Development', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Change Management', level: 'Intermediate', category: 'Management' },
+      { name: 'Performance Management', level: 'Advanced', category: 'Management' },
+      { name: 'Workforce Planning', level: 'Intermediate', category: 'Management' },
+    ],
+    'people and culture': [
+      { name: 'HR Business Partnering', level: 'Advanced', category: 'Management' },
+      { name: 'Culture & Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Talent Development', level: 'Advanced', category: 'Management' },
+      { name: 'Diversity & Inclusion', level: 'Intermediate', category: 'Management' },
+      { name: 'Recruitment', level: 'Intermediate', category: 'Management' },
+      { name: 'Change Management', level: 'Intermediate', category: 'Management' },
+    ],
+    'communications manager': [
+      { name: 'Internal Communications', level: 'Advanced', category: 'Marketing' },
+      { name: 'External Communications', level: 'Advanced', category: 'Marketing' },
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Content Creation', level: 'Advanced', category: 'Marketing' },
+      { name: 'Media Relations', level: 'Intermediate', category: 'Marketing' },
+      { name: 'Brand Management', level: 'Intermediate', category: 'Marketing' },
+      { name: 'Copywriting', level: 'Intermediate', category: 'Marketing' },
+    ],
+    'software engineer': [
+      { name: 'Software Development', level: 'Advanced', category: 'Programming' },
+      { name: 'API Integration', level: 'Advanced', category: 'Programming' },
+      { name: 'Python', level: 'Advanced', category: 'Programming' },
+      { name: 'SQL', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Cloud (AWS)', level: 'Intermediate', category: 'Cloud' },
+      { name: 'Agile / Scrum', level: 'Intermediate', category: 'Management' },
+    ],
+    'manager': [
+      { name: 'Leadership', level: 'Advanced', category: 'Management' },
+      { name: 'People Management', level: 'Advanced', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Intermediate', category: 'Management' },
+      { name: 'Budget Management', level: 'Intermediate', category: 'General' },
+      { name: 'Communication', level: 'Advanced', category: 'Management' },
+    ],
+    'analyst': [
+      { name: 'Data Analysis', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Excel (Advanced)', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Reporting', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Research', level: 'Intermediate', category: 'Research' },
+      { name: 'Business Case Development', level: 'Beginner', category: 'General' },
+    ],
+    'advisor': [
+      { name: 'Stakeholder Engagement', level: 'Advanced', category: 'Management' },
+      { name: 'Strategic Planning', level: 'Intermediate', category: 'Strategy' },
+      { name: 'Research', level: 'Intermediate', category: 'Research' },
+      { name: 'Policy Analysis', level: 'Intermediate', category: 'Strategy' },
+      { name: 'Communication', level: 'Advanced', category: 'Management' },
+    ],
+    'coordinator': [
+      { name: 'Project Management', level: 'Intermediate', category: 'Management' },
+      { name: 'Communication', level: 'Intermediate', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Intermediate', category: 'Management' },
+      { name: 'Document Control', level: 'Intermediate', category: 'General' },
+      { name: 'Scheduling', level: 'Beginner', category: 'Management' },
+    ],
+    'specialist': [
+      { name: 'Stakeholder Engagement', level: 'Intermediate', category: 'Management' },
+      { name: 'Research', level: 'Intermediate', category: 'Research' },
+      { name: 'Reporting', level: 'Intermediate', category: 'Analytics' },
+      { name: 'Communication', level: 'Intermediate', category: 'Management' },
+    ],
+    'officer': [
+      { name: 'Communication', level: 'Intermediate', category: 'Management' },
+      { name: 'Stakeholder Engagement', level: 'Intermediate', category: 'Management' },
+      { name: 'Reporting', level: 'Beginner', category: 'Analytics' },
+      { name: 'Document Control', level: 'Intermediate', category: 'General' },
+    ],
+  };
+
+    const inferSkillsFromTitle = (title) => {
+    if (!title) return [];
+    const lower = title.toLowerCase();
+    // Try exact match first, then partial keyword match
+    for (const [key, skills] of Object.entries(JOB_TITLE_SKILLS)) {
+      if (lower.includes(key)) return skills;
+    }
+    return [];
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-sky-50">
       {/* Header */}
@@ -559,6 +2569,12 @@ window.storage = {
                       setGrowthAreasInput('');
                       setWillingToMentor(false);
                       setWillingToPresent(false);
+                      setJobTitleInput('');
+                      setSuggestedSkills([]);
+                      setShowSuggestionBanner(false);
+                      setTitleAutocomplete([]);
+                      setShowTitleDropdown(false);
+                      setTitleDropdownIndex(-1);
                       setIsSubmitting(false);
                     }}
                     className="px-6 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50"
@@ -588,7 +2604,7 @@ window.storage = {
                   const validSkills = skillInputs.filter(s => s.name.trim());
                   
                   if (validSkills.length === 0) {
-                    alert('Please add at least one skill');
+                    alert('Please add at least one skill using the skill picker or by typing one in');
                     setIsSubmitting(false);
                     return;
                   }
@@ -627,14 +2643,116 @@ window.storage = {
                     />
                   </div>
                   
-                  <div>
+                  <div className="relative">
                     <label className="block text-sm font-semibold text-slate-700 mb-2">Job Title *</label>
-                    <input 
-                      name="role" 
-                      required 
+                    <input
+                      name="role"
+                      required
+                      autoComplete="off"
+                      value={jobTitleInput}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setJobTitleInput(val);
+                        setTitleDropdownIndex(-1);
+                        if (val.trim().length >= 2) {
+                          const lower = val.toLowerCase();
+                          const liveRoles = employees.map(emp => emp.role).filter(Boolean);
+                          const allRoles = [...new Set([...liveRoles, ...HISTORICAL_TITLES])];
+                          const matches = allRoles
+                            .filter(r => r.toLowerCase().includes(lower))
+                            .sort((a, b) => {
+                              const aLive = liveRoles.includes(a), bLive = liveRoles.includes(b);
+                              const aStarts = a.toLowerCase().startsWith(lower);
+                              const bStarts = b.toLowerCase().startsWith(lower);
+                              // Live roles first, then starts-with, then alpha
+                              if (aLive && !bLive) return -1;
+                              if (!aLive && bLive) return 1;
+                              if (aStarts && !bStarts) return -1;
+                              if (!aStarts && bStarts) return 1;
+                              return a.localeCompare(b);
+                            })
+                            .slice(0, 8);
+                          setTitleAutocomplete(matches);
+                          setShowTitleDropdown(matches.length > 0);
+                        } else {
+                          setTitleAutocomplete([]);
+                          setShowTitleDropdown(false);
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if (!showTitleDropdown) return;
+                        if (e.key === 'ArrowDown') {
+                          e.preventDefault();
+                          setTitleDropdownIndex(i => Math.min(i + 1, titleAutocomplete.length - 1));
+                        } else if (e.key === 'ArrowUp') {
+                          e.preventDefault();
+                          setTitleDropdownIndex(i => Math.max(i - 1, -1));
+                        } else if (e.key === 'Enter' && titleDropdownIndex >= 0) {
+                          e.preventDefault();
+                          const selected = titleAutocomplete[titleDropdownIndex];
+                          setJobTitleInput(selected);
+                          setShowTitleDropdown(false);
+                          setTitleDropdownIndex(-1);
+                          const inferred = inferSkillsFromTitle(selected);
+                          if (inferred.length > 0) { setSuggestedSkills(inferred); setShowSuggestionBanner(true); }
+                        } else if (e.key === 'Escape') {
+                          setShowTitleDropdown(false);
+                        }
+                      }}
+                      onBlur={() => {
+                        setTimeout(() => {
+                          setShowTitleDropdown(false);
+                          const inferred = inferSkillsFromTitle(jobTitleInput);
+                          if (inferred.length > 0 && !showSuggestionBanner) {
+                            setSuggestedSkills(inferred);
+                            setShowSuggestionBanner(true);
+                          }
+                        }, 150);
+                      }}
+                      onFocus={() => {
+                        if (titleAutocomplete.length > 0) setShowTitleDropdown(true);
+                      }}
                       className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
-                      placeholder="Senior Software Engineer"
+                      placeholder="e.g. Electrical Engineer, Financial Analyst"
                     />
+                    {showTitleDropdown && titleAutocomplete.length > 0 && (
+                      <ul className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg overflow-hidden">
+                        {(() => {
+                          const liveSet = new Set(employees.map(e => e.role).filter(Boolean));
+                          return titleAutocomplete.map((title, idx) => (
+                          <li
+                            key={title}
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              setJobTitleInput(title);
+                              setShowTitleDropdown(false);
+                              setTitleDropdownIndex(-1);
+                              const inferred = inferSkillsFromTitle(title);
+                              if (inferred.length > 0) { setSuggestedSkills(inferred); setShowSuggestionBanner(true); }
+                            }}
+                            className={`px-4 py-2.5 cursor-pointer text-sm flex items-center gap-2 ${idx === titleDropdownIndex ? 'bg-sky-50 text-sky-700' : 'text-slate-700 hover:bg-slate-50'}`}
+                          >
+                            {liveSet.has(title)
+                              ? <span title="Used in your organisation" className="w-2 h-2 rounded-full bg-sky-400 flex-shrink-0 mt-0.5"></span>
+                              : <span className="text-slate-300 text-xs flex-shrink-0">↩</span>
+                            }
+                            <span>
+                              {(() => {
+                                const lower = jobTitleInput.toLowerCase();
+                                const i = title.toLowerCase().indexOf(lower);
+                                if (i === -1) return title;
+                                return React.createElement(React.Fragment, null,
+                                  title.slice(0, i),
+                                  React.createElement('strong', { className: 'text-sky-600 font-semibold' }, title.slice(i, i + jobTitleInput.length)),
+                                  title.slice(i + jobTitleInput.length)
+                                );
+                              })()}
+                            </span>
+                          </li>
+                        ));
+                        })()}
+                      </ul>
+                    )}
                   </div>
                   
                   <div>
@@ -672,96 +2790,175 @@ window.storage = {
                 </div>
 
                 <div className="border-t border-slate-200 pt-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <h3 className="text-lg font-semibold text-slate-900">Your Skills</h3>
-                      <p className="text-sm text-slate-600">Add all skills you'd like to use in short-term projects</p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setSkillInputs([...skillInputs, { name: '', level: 'Intermediate', category: 'General' }])}
-                      className="flex items-center gap-2 px-3 py-2 text-sm bg-sky-50 text-sky-600 rounded-lg hover:bg-sky-100 transition-colors"
-                    >
-                      <Plus className="w-4 h-4" />
-                      Add Skill
-                    </button>
+                  <div className="mb-4">
+                    <h3 className="text-lg font-semibold text-slate-900">Your Skills</h3>
+                    <p className="text-sm text-slate-600 mt-1">Search and click skills to add them, then set your proficiency level. Can't find one? Type it in at the bottom.</p>
                   </div>
 
-                  <div className="space-y-3">
-                    {skillInputs.map((skill, index) => (
-                      <div key={index} className="flex gap-3 items-start">
+                  {/* Job title suggestion banner */}
+                  {showSuggestionBanner && suggestedSkills.length > 0 && (
+                    <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                      <div className="flex items-start justify-between gap-3">
                         <div className="flex-1">
-                          <input
-                            type="text"
-                            value={skill.name}
-                            onChange={(e) => {
-                              const newSkills = [...skillInputs];
-                              newSkills[index].name = e.target.value;
-                              setSkillInputs(newSkills);
-                            }}
-                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
-                            placeholder="e.g., Python, Project Management, Data Analysis"
-                            required={index === 0}
-                          />
+                          <p className="text-sm font-semibold text-amber-900 mb-2">
+                            ✨ We found skills that match your job title — want to preload them?
+                          </p>
+                          <div className="flex flex-wrap gap-1.5 mb-3">
+                            {suggestedSkills.map((s, i) => (
+                              <span key={i} className="px-2.5 py-1 bg-white border border-amber-300 text-amber-800 rounded-full text-xs font-medium">
+                                {s.name} · {s.level}
+                              </span>
+                            ))}
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSkillInputs(suggestedSkills);
+                                setShowSuggestionBanner(false);
+                              }}
+                              className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold rounded-lg transition-colors"
+                            >
+                              Yes, add these skills
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setShowSuggestionBanner(false)}
+                              className="px-4 py-2 border border-amber-300 text-amber-800 text-sm rounded-lg hover:bg-amber-100 transition-colors"
+                            >
+                              No thanks, I'll pick manually
+                            </button>
+                          </div>
                         </div>
-                        <div className="w-40">
-                          <select
-                            value={skill.level}
-                            onChange={(e) => {
-                              const newSkills = [...skillInputs];
-                              newSkills[index].level = e.target.value;
-                              setSkillInputs(newSkills);
-                            }}
-                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
-                          >
-                            <option value="Beginner">Beginner</option>
-                            <option value="Intermediate">Intermediate</option>
-                            <option value="Advanced">Advanced</option>
-                            <option value="Expert">Expert</option>
-                          </select>
-                        </div>
-                        <div className="w-40">
-                          <select
-                            value={skill.category}
-                            onChange={(e) => {
-                              const newSkills = [...skillInputs];
-                              newSkills[index].category = e.target.value;
-                              setSkillInputs(newSkills);
-                            }}
-                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
-                          >
-                            <option value="General">General</option>
-                            <option value="Programming">Programming</option>
-                            <option value="Design">Design</option>
-                            <option value="Analytics">Analytics</option>
-                            <option value="Marketing">Marketing</option>
-                            <option value="Cloud">Cloud</option>
-                            <option value="Database">Database</option>
-                            <option value="DevOps">DevOps</option>
-                            <option value="Architecture">Architecture</option>
-                            <option value="Strategy">Strategy</option>
-                            <option value="Research">Research</option>
-                            <option value="Management">Management</option>
-                          </select>
-                        </div>
-                        {skillInputs.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSkillInputs(skillInputs.filter((_, i) => i !== index));
-                            }}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          >
-                            <X className="w-5 h-5" />
-                          </button>
-                        )}
                       </div>
-                    ))}
+                    </div>
+                  )}
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-4">
+                    {/* Search */}
+                    <div className="relative mb-3">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <input
+                        type="text"
+                        value={skillPickerSearch}
+                        onChange={e => setSkillPickerSearch(e.target.value)}
+                        className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white"
+                        placeholder="Search skills..."
+                      />
+                    </div>
+                    {/* Category tabs */}
+                    <div className="flex flex-wrap gap-1.5 mb-3">
+                      {['All', ...Object.keys(SKILL_LIBRARY)].map(cat => (
+                        <button
+                          key={cat}
+                          type="button"
+                          onClick={() => setSkillPickerCategory(cat)}
+                          className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${skillPickerCategory === cat ? 'bg-sky-600 text-white' : 'bg-white border border-slate-300 text-slate-600 hover:border-sky-400 hover:text-sky-600'}`}
+                        >
+                          {cat}
+                        </button>
+                      ))}
+                    </div>
+                    {/* Skill tags */}
+                    <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto">
+                      {(() => {
+                        const selectedNames = skillInputs.map(s => s.name.toLowerCase()).filter(Boolean);
+                        const cats = skillPickerCategory === 'All' ? Object.keys(SKILL_LIBRARY) : [skillPickerCategory];
+                        const allTags = cats.flatMap(cat => SKILL_LIBRARY[cat].map(skill => ({ skill, cat })));
+                        const filtered = skillPickerSearch
+                          ? allTags.filter(({ skill }) => skill.toLowerCase().includes(skillPickerSearch.toLowerCase()))
+                          : allTags;
+                        if (filtered.length === 0) return <p className="text-xs text-slate-500 py-2">No skills match your search.</p>;
+                        return filtered.map(({ skill, cat }) => {
+                          const alreadyAdded = selectedNames.includes(skill.toLowerCase());
+                          return (
+                            <button
+                              key={skill + cat}
+                              type="button"
+                              disabled={alreadyAdded}
+                              onClick={() => {
+                                const categoryMap = {
+                                  'Energy & Utilities': 'General', 'Engineering': 'General',
+                                  'Commercial & Finance': 'General', 'Strategy & Analytics': 'Analytics',
+                                  'Technology': 'Programming', 'People & Leadership': 'Management',
+                                  'Projects & Operations': 'Management', 'Communications & Marketing': 'Marketing'
+                                };
+                                const validSkillInputs = skillInputs.filter(s => s.name.trim());
+                                setSkillInputs([...validSkillInputs, { name: skill, level: 'Intermediate', category: categoryMap[cat] || 'General' }]);
+                              }}
+                              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
+                                alreadyAdded
+                                  ? 'bg-sky-100 border-sky-300 text-sky-500 cursor-default'
+                                  : 'bg-white border-slate-300 text-slate-700 hover:bg-sky-50 hover:border-sky-400 hover:text-sky-700 cursor-pointer'
+                              }`}
+                            >
+                              {alreadyAdded ? '✓ ' : '+ '}{skill}
+                            </button>
+                          );
+                        });
+                      })()}
+                    </div>
+                  </div>
+
+                  {/* Selected skills list */}
+                  {skillInputs.filter(s => s.name.trim()).length > 0 && (
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-sm font-semibold text-slate-700">Selected skills — set your proficiency level:</p>
+                        <span className="text-xs text-slate-500">{skillInputs.filter(s => s.name.trim()).length} added</span>
+                      </div>
+                      <div className="space-y-2">
+                        {skillInputs.map((skill, index) => skill.name.trim() ? (
+                          <div key={index} className="flex items-center gap-3 bg-white border border-slate-200 rounded-lg px-3 py-2">
+                            <span className="flex-1 text-sm font-medium text-slate-800">{skill.name}</span>
+                            <select
+                              value={skill.level}
+                              onChange={(e) => {
+                                const newSkills = [...skillInputs];
+                                newSkills[index].level = e.target.value;
+                                setSkillInputs(newSkills);
+                              }}
+                              className="w-36 px-2 py-1.5 border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-sky-500"
+                            >
+                              <option value="Beginner">Beginner</option>
+                              <option value="Intermediate">Intermediate</option>
+                              <option value="Advanced">Advanced</option>
+                              <option value="Expert">Expert</option>
+                            </select>
+                            <button
+                              type="button"
+                              onClick={() => setSkillInputs(skillInputs.filter((_, i) => i !== index))}
+                              className="p-1 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ) : null)}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Manual add */}
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="text"
+                      placeholder="Can't find your skill? Type it here and press Enter..."
+                      className="flex-1 px-4 py-2 border border-dashed border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && e.target.value.trim()) {
+                          e.preventDefault();
+                          const val = e.target.value.trim();
+                          if (!skillInputs.find(s => s.name.toLowerCase() === val.toLowerCase())) {
+                            setSkillInputs([...skillInputs.filter(s => s.name.trim()), { name: val, level: 'Intermediate', category: 'General' }]);
+                          }
+                          e.target.value = '';
+                        }
+                      }}
+                    />
                   </div>
 
                   <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     <p className="text-sm text-blue-900">
-                      <strong>Tip:</strong> Be thorough with your skills! The more skills you add, the better we can match you with relevant projects. Think about skills you have outside of the workplace: what are you passionate about and good at? Example: Organising Events or Training / Mentoring.
+                      <strong>Tip:</strong> Be thorough with your skills! Think about what you do outside the workplace too — event organisation, coaching, training others. The more you add, the better we can match you.
                     </p>
                   </div>
                 </div>
