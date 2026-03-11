@@ -3331,7 +3331,33 @@ window.storage = {
           <div className="space-y-4 sm:space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">Analytics Dashboard</h2>
-              <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors text-sm">
+              <button
+                onClick={() => {
+                  const rows = [
+                    ['Name', 'Role', 'Department', 'Team', 'Availability', 'Willing to Mentor', 'Willing to Present', 'Skills', 'Growth Areas'],
+                    ...analyticsEmployees.map(e => [
+                      e.name,
+                      e.role,
+                      e.department,
+                      e.team,
+                      e.availability,
+                      e.willingToMentor ? 'Yes' : 'No',
+                      e.willingToPresent ? 'Yes' : 'No',
+                      (e.skills || []).map(s => `${s.name} (${s.level})`).join('; '),
+                      (e.growthAreas || []).join('; '),
+                    ])
+                  ];
+                  const csv = rows.map(r => r.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
+                  const blob = new Blob([csv], { type: 'text/csv' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `skills-report-${new Date().toISOString().slice(0,10)}.csv`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+                className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors text-sm"
+              >
                 <Download className="w-4 h-4" />
                 Export Report
               </button>
@@ -3388,26 +3414,6 @@ window.storage = {
               </div>
             </div>
 
-            {/* Key Metrics */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-              <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-                <div className="text-2xl sm:text-3xl font-bold text-slate-900">{analyticsEmployees.length}</div>
-                <div className="text-xs sm:text-sm text-slate-600">Employees</div>
-              </div>
-              <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-                <div className="text-2xl sm:text-3xl font-bold text-slate-900">{Object.keys(analytics.skillMap).length}</div>
-                <div className="text-xs sm:text-sm text-slate-600">Unique Skills</div>
-              </div>
-              <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-                <div className="text-2xl sm:text-3xl font-bold text-slate-900">{Object.keys(analytics.departmentSkills).length}</div>
-                <div className="text-xs sm:text-sm text-slate-600">Business Units</div>
-              </div>
-              <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-                <div className="text-2xl sm:text-3xl font-bold text-slate-900">{projects.length}</div>
-                <div className="text-xs sm:text-sm text-slate-600">Open Opportunities</div>
-              </div>
-            </div>
-
             {/* Platform Health — Measures of Success */}
             <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm">
               <div className="flex items-start justify-between mb-1">
@@ -3419,11 +3425,23 @@ window.storage = {
               {/* KPI grid */}
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
                 {/* Profiles */}
-                <div className="rounded-xl border border-slate-200 p-4">
-                  <div className="text-2xl font-bold text-slate-900">{platformMetrics.totalProfiles}</div>
-                  <div className="text-xs font-semibold text-slate-600 mt-0.5">Profiles submitted</div>
-                  <div className="text-xs text-slate-400 mt-1">Target: growing month-on-month</div>
-                </div>
+                {(() => {
+                  const HEADCOUNT = 400;
+                  const pct = Math.round((platformMetrics.totalProfiles / HEADCOUNT) * 100);
+                  const color = pct >= 75 ? 'border-emerald-200 bg-emerald-50' : pct >= 40 ? 'border-amber-200 bg-amber-50' : 'border-slate-200';
+                  const statusColor = pct >= 75 ? 'text-emerald-600' : pct >= 40 ? 'text-amber-600' : 'text-slate-400';
+                  const statusText = pct >= 75 ? '✓ Strong participation' : pct >= 40 ? '↑ Growing steadily' : 'Target: grow participation';
+                  return (
+                    <div className={`rounded-xl border p-4 ${color}`}>
+                      <div className="flex items-baseline gap-2">
+                        <div className="text-2xl font-bold text-slate-900">{platformMetrics.totalProfiles}</div>
+                        <div className="text-lg font-semibold text-slate-500">{pct}%</div>
+                      </div>
+                      <div className="text-xs font-semibold text-slate-600 mt-0.5">Profiles submitted</div>
+                      <div className={`text-xs mt-1 ${statusColor}`}>{statusText}</div>
+                    </div>
+                  );
+                })()}
 
                 {/* Avg skills */}
                 <div className={`rounded-xl border p-4 ${Number(platformMetrics.avgSkillsPerEmployee) >= 4 ? 'border-emerald-200 bg-emerald-50' : Number(platformMetrics.avgSkillsPerEmployee) >= 2 ? 'border-amber-200 bg-amber-50' : 'border-slate-200'}`}>
@@ -3518,6 +3536,27 @@ window.storage = {
                 </div>
               )}
             </div>
+
+            {/* Key Metrics */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                <div className="text-2xl sm:text-3xl font-bold text-slate-900">{analyticsEmployees.length}</div>
+                <div className="text-xs sm:text-sm text-slate-600">Employees</div>
+              </div>
+              <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                <div className="text-2xl sm:text-3xl font-bold text-slate-900">{Object.keys(analytics.skillMap).length}</div>
+                <div className="text-xs sm:text-sm text-slate-600">Unique Skills</div>
+              </div>
+              <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                <div className="text-2xl sm:text-3xl font-bold text-slate-900">{Object.keys(analytics.departmentSkills).length}</div>
+                <div className="text-xs sm:text-sm text-slate-600">Business Units</div>
+              </div>
+              <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                <div className="text-2xl sm:text-3xl font-bold text-slate-900">{projects.length}</div>
+                <div className="text-xs sm:text-sm text-slate-600">Open Opportunities</div>
+              </div>
+            </div>
+
 
             {analyticsEmployees.length === 0 ? (
               <div className="bg-white rounded-xl p-8 sm:p-12 border border-slate-200 text-center">
