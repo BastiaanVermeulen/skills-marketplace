@@ -518,6 +518,51 @@ window.storage = {
     .sort((a, b) => b[1].count - a[1].count)
     .slice(0, 10);
 
+  // ── Platform Health Metrics ──────────────────────────────────────────
+  const platformMetrics = (() => {
+    const totalProfiles = employees.length;
+    const avgSkillsPerEmployee = totalProfiles === 0 ? 0
+      : (employees.reduce((sum, e) => sum + (e.skills || []).length, 0) / totalProfiles).toFixed(1);
+    const mentorCount = employees.filter(e => e.willingToMentor).length;
+    const presenterCount = employees.filter(e => e.willingToPresent).length;
+    const mentorPct = totalProfiles === 0 ? 0 : Math.round((mentorCount / totalProfiles) * 100);
+    const presenterPct = totalProfiles === 0 ? 0 : Math.round((presenterCount / totalProfiles) * 100);
+
+    const openProjects = projects.filter(p => !p._deleted && p.status !== 'Closed');
+    const totalOpps = openProjects.length;
+    const oppsWithInterest = openProjects.filter(p =>
+      interests.some(i => !i._deleted && i.projectId === p.id)
+    ).length;
+    const oppEngagementRate = totalOpps === 0 ? null : Math.round((oppsWithInterest / totalOpps) * 100);
+    const avgInterestPerOpp = totalOpps === 0 ? null
+      : (interests.filter(i => !i._deleted).length / totalOpps).toFixed(1);
+
+    // Skill supply vs demand gap
+    const allRequiredSkills = openProjects.flatMap(p => p.requiredSkills || []);
+    const requiredSkillCounts = {};
+    allRequiredSkills.forEach(s => { requiredSkillCounts[s] = (requiredSkillCounts[s] || 0) + 1; });
+    const employeeSkillCounts = {};
+    employees.forEach(emp => {
+      (emp.skills || []).forEach(s => {
+        employeeSkillCounts[s.name] = (employeeSkillCounts[s.name] || 0) + 1;
+      });
+    });
+    const skillGaps = Object.entries(requiredSkillCounts)
+      .map(([skill, demand]) => ({
+        skill,
+        demand,
+        supply: employeeSkillCounts[skill] || 0,
+        gap: demand - (employeeSkillCounts[skill] || 0),
+      }))
+      .filter(s => s.supply < s.demand)
+      .sort((a, b) => b.gap - a.gap || b.demand - a.demand)
+      .slice(0, 8);
+
+    return { totalProfiles, avgSkillsPerEmployee, mentorCount, presenterCount,
+      mentorPct, presenterPct, totalOpps, oppsWithInterest, oppEngagementRate,
+      avgInterestPerOpp, skillGaps };
+  })();
+
   
   const filteredEmployees = employees.filter(emp => {
     const matchesSearch = emp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -2509,11 +2554,10 @@ window.storage = {
           <div className="flex gap-1 min-w-max">
             {[
               { id: 'self-service', label: 'Submit Skills', icon: Users },
-              { id: 'opportunities', label: 'Browse Opportunities', icon: Target },
-              { id: 'analytics', label: 'Analytics Dashboard', icon: BarChart3 },
               { id: 'directory', label: 'Skills Directory', icon: Users },
+              { id: 'opportunities', label: 'Browse Opportunities', icon: Target },
               { id: 'projects', label: 'Launch an Opportunity', icon: Briefcase },
-              { id: 'admin', label: 'Admin', icon: Settings }
+              { id: 'analytics', label: 'Analytics Dashboard', icon: BarChart3 },
             ].map(tab => (
               <button
                 key={tab.id}
@@ -3364,6 +3408,117 @@ window.storage = {
               </div>
             </div>
 
+            {/* Platform Health — Measures of Success */}
+            <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm">
+              <div className="flex items-start justify-between mb-1">
+                <h3 className="text-base sm:text-lg font-semibold text-slate-900">Platform Health</h3>
+                <span className="text-xs bg-sky-100 text-sky-700 font-semibold px-2 py-0.5 rounded-full">Measures of Success</span>
+              </div>
+              <p className="text-xs text-slate-500 mb-5">Key indicators of how well the platform is working. Target thresholds are guidance, not hard rules.</p>
+
+              {/* KPI grid */}
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
+                {/* Profiles */}
+                <div className="rounded-xl border border-slate-200 p-4">
+                  <div className="text-2xl font-bold text-slate-900">{platformMetrics.totalProfiles}</div>
+                  <div className="text-xs font-semibold text-slate-600 mt-0.5">Profiles submitted</div>
+                  <div className="text-xs text-slate-400 mt-1">Target: growing month-on-month</div>
+                </div>
+
+                {/* Avg skills */}
+                <div className={`rounded-xl border p-4 ${Number(platformMetrics.avgSkillsPerEmployee) >= 4 ? 'border-emerald-200 bg-emerald-50' : Number(platformMetrics.avgSkillsPerEmployee) >= 2 ? 'border-amber-200 bg-amber-50' : 'border-slate-200'}`}>
+                  <div className="text-2xl font-bold text-slate-900">{platformMetrics.avgSkillsPerEmployee}</div>
+                  <div className="text-xs font-semibold text-slate-600 mt-0.5">Avg skills per employee</div>
+                  <div className={`text-xs mt-1 ${Number(platformMetrics.avgSkillsPerEmployee) >= 4 ? 'text-emerald-600' : Number(platformMetrics.avgSkillsPerEmployee) >= 2 ? 'text-amber-600' : 'text-slate-400'}`}>
+                    {Number(platformMetrics.avgSkillsPerEmployee) >= 4 ? '✓ Good depth' : Number(platformMetrics.avgSkillsPerEmployee) >= 2 ? '↑ Target: 4+' : 'Target: 4+'}
+                  </div>
+                </div>
+
+                {/* Opportunity engagement rate */}
+                <div className={`rounded-xl border p-4 ${platformMetrics.oppEngagementRate === null ? 'border-slate-200' : platformMetrics.oppEngagementRate >= 75 ? 'border-emerald-200 bg-emerald-50' : platformMetrics.oppEngagementRate >= 40 ? 'border-amber-200 bg-amber-50' : 'border-red-200 bg-red-50'}`}>
+                  <div className="text-2xl font-bold text-slate-900">
+                    {platformMetrics.oppEngagementRate === null ? '—' : `${platformMetrics.oppEngagementRate}%`}
+                  </div>
+                  <div className="text-xs font-semibold text-slate-600 mt-0.5">Opps with ≥1 expression of interest</div>
+                  <div className={`text-xs mt-1 ${platformMetrics.oppEngagementRate === null ? 'text-slate-400' : platformMetrics.oppEngagementRate >= 75 ? 'text-emerald-600' : platformMetrics.oppEngagementRate >= 40 ? 'text-amber-600' : 'text-red-500'}`}>
+                    {platformMetrics.oppEngagementRate === null ? 'No opportunities yet' : platformMetrics.oppEngagementRate >= 75 ? '✓ Healthy engagement' : platformMetrics.oppEngagementRate >= 40 ? '↑ Target: 75%+' : '⚠ Low engagement'}
+                  </div>
+                </div>
+
+                {/* Avg interest per opp */}
+                <div className={`rounded-xl border p-4 ${platformMetrics.avgInterestPerOpp === null ? 'border-slate-200' : Number(platformMetrics.avgInterestPerOpp) >= 3 ? 'border-emerald-200 bg-emerald-50' : 'border-slate-200'}`}>
+                  <div className="text-2xl font-bold text-slate-900">
+                    {platformMetrics.avgInterestPerOpp === null ? '—' : platformMetrics.avgInterestPerOpp}
+                  </div>
+                  <div className="text-xs font-semibold text-slate-600 mt-0.5">Avg expressions of interest / opportunity</div>
+                  <div className={`text-xs mt-1 ${platformMetrics.avgInterestPerOpp === null ? 'text-slate-400' : Number(platformMetrics.avgInterestPerOpp) >= 3 ? 'text-emerald-600' : 'text-slate-400'}`}>
+                    {platformMetrics.avgInterestPerOpp === null ? 'No opportunities yet' : Number(platformMetrics.avgInterestPerOpp) >= 3 ? '✓ Good interest level' : 'Target: 3+'}
+                  </div>
+                </div>
+
+                {/* Mentor rate */}
+                <div className={`rounded-xl border p-4 ${platformMetrics.mentorPct >= 20 ? 'border-emerald-200 bg-emerald-50' : 'border-slate-200'}`}>
+                  <div className="text-2xl font-bold text-slate-900">
+                    {platformMetrics.totalProfiles === 0 ? '—' : `${platformMetrics.mentorPct}%`}
+                    <span className="text-sm font-normal text-slate-500 ml-1">({platformMetrics.mentorCount})</span>
+                  </div>
+                  <div className="text-xs font-semibold text-slate-600 mt-0.5">🎓 Happy to mentor</div>
+                  <div className={`text-xs mt-1 ${platformMetrics.mentorPct >= 20 ? 'text-emerald-600' : 'text-slate-400'}`}>
+                    {platformMetrics.totalProfiles === 0 ? 'No profiles yet' : platformMetrics.mentorPct >= 20 ? '✓ Good mentor pool' : 'Target: 20%+'}
+                  </div>
+                </div>
+
+                {/* Presenter rate */}
+                <div className={`rounded-xl border p-4 ${platformMetrics.presenterPct >= 10 ? 'border-emerald-200 bg-emerald-50' : 'border-slate-200'}`}>
+                  <div className="text-2xl font-bold text-slate-900">
+                    {platformMetrics.totalProfiles === 0 ? '—' : `${platformMetrics.presenterPct}%`}
+                    <span className="text-sm font-normal text-slate-500 ml-1">({platformMetrics.presenterCount})</span>
+                  </div>
+                  <div className="text-xs font-semibold text-slate-600 mt-0.5">🎤 Happy to present</div>
+                  <div className={`text-xs mt-1 ${platformMetrics.presenterPct >= 10 ? 'text-emerald-600' : 'text-slate-400'}`}>
+                    {platformMetrics.totalProfiles === 0 ? 'No profiles yet' : platformMetrics.presenterPct >= 10 ? '✓ Good presenter pool' : 'Target: 10%+'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Skill supply vs demand gap */}
+              {platformMetrics.skillGaps.length > 0 && (
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-sm font-semibold text-slate-800">Skill Supply vs Demand Gap</h4>
+                    <span className="text-xs text-slate-500">Skills required by open opportunities with insufficient employee coverage</span>
+                  </div>
+                  <div className="space-y-2.5">
+                    {platformMetrics.skillGaps.map(({ skill, demand, supply }) => {
+                      const coveragePct = demand === 0 ? 0 : Math.round((supply / demand) * 100);
+                      const barColor = coveragePct === 0 ? '#EF4444' : coveragePct < 50 ? '#F59E0B' : '#10B981';
+                      return (
+                        <div key={skill}>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-sm font-medium text-slate-800">{skill}</span>
+                            <span className="text-xs text-slate-500">
+                              {supply} employee{supply !== 1 ? 's' : ''} · {demand} opp{demand !== 1 ? 's' : ''} need it
+                            </span>
+                          </div>
+                          <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div className="h-full rounded-full transition-all" style={{ width: `${Math.max(coveragePct, supply > 0 ? 4 : 0)}%`, backgroundColor: barColor }} />
+                          </div>
+                          <div className="text-xs mt-0.5" style={{ color: barColor }}>
+                            {coveragePct === 0 ? 'No coverage — consider hiring or development' : `${coveragePct}% coverage`}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+              {platformMetrics.skillGaps.length === 0 && projects.filter(p => !p._deleted).length > 0 && (
+                <div className="text-sm text-emerald-700 bg-emerald-50 rounded-lg px-4 py-3">
+                  ✓ All skills required by open opportunities are covered by at least one registered employee.
+                </div>
+              )}
+            </div>
+
             {analyticsEmployees.length === 0 ? (
               <div className="bg-white rounded-xl p-8 sm:p-12 border border-slate-200 text-center">
                 <h3 className="text-lg sm:text-xl font-semibold text-slate-900 mb-2">No analytics data available</h3>
@@ -3758,184 +3913,6 @@ window.storage = {
           </div>
         )}
 
-        {/* Admin */}
-        {activeTab === 'admin' && (
-          <div className="space-y-4 sm:space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
-              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">Admin Panel</h2>
-              <button
-                onClick={() => setShowAddEmployee(true)}
-                className="flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-sky-600 to-sky-600 text-white rounded-lg hover:from-sky-700 hover:to-sky-700 transition-all shadow-md text-sm sm:text-base"
-              >
-                <Plus className="w-4 h-4" />
-                Add Employee
-              </button>
-            </div>
-
-            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[640px]">
-                  <thead className="bg-slate-50 border-b border-slate-200">
-                    <tr>
-                      <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Name</th>
-                      <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Role</th>
-                      <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider hidden sm:table-cell">Business Unit</th>
-                      <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider hidden md:table-cell">Team</th>
-                      <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Skills</th>
-                      <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Status</th>
-                      <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-200">
-                    {employees.length === 0 ? (
-                      <tr>
-                        <td colSpan="7" className="px-4 sm:px-6 py-8 text-center text-sm text-slate-500">No employees yet. Add an employee to get started.</td>
-                      </tr>
-                    ) : employees.map(emp => (
-                      <tr key={emp.id} className="hover:bg-slate-50 transition-colors">
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap font-medium text-slate-900 text-sm">{emp.name}</td>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-slate-600">{emp.role}</td>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-slate-600 hidden sm:table-cell">{emp.department}</td>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-slate-600 hidden md:table-cell">{emp.team}</td>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4">
-                          <div className="flex flex-wrap gap-1">
-                            {emp.skills.slice(0, 3).map((skill, idx) => (
-                              <span key={idx} className="px-2 py-0.5 sm:py-1 bg-sky-100 text-sky-700 rounded text-xs">
-                                {skill.name}
-                              </span>
-                            ))}
-                            {emp.skills.length > 3 && (
-                              <span className="px-2 py-0.5 sm:py-1 bg-slate-100 text-slate-600 rounded text-xs">
-                                +{emp.skills.length - 3}
-                              </span>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            emp.availability === 'Available' 
-                              ? 'bg-green-100 text-green-700'
-                              : emp.availability === 'Partially Available'
-                              ? 'bg-yellow-100 text-yellow-700'
-                              : 'bg-red-100 text-red-700'
-                          }`}>
-                            {emp.availability}
-                          </span>
-                        </td>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
-                          <button
-                            onClick={() => handleDeleteEmployee(emp.id)}
-                            className="px-3 py-1.5 text-xs sm:text-sm bg-red-100 text-red-700 rounded-lg hover:bg-red-200"
-                          >
-                            Delete
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <div className="px-4 py-3 bg-slate-50 border-t border-slate-200 text-xs text-slate-600 sm:hidden">
-                Swipe left to see more columns →
-              </div>
-            </div>
-
-            {/* Add Employee Modal */}
-            {showAddEmployee && (
-              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                <div className="bg-white rounded-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-semibold">Add New Employee</h3>
-                    <button onClick={() => setShowAddEmployee(false)} className="text-slate-400 hover:text-slate-600">
-                      <X className="w-5 h-5" />
-                    </button>
-                  </div>
-                  <form onSubmit={(e) => {
-                    e.preventDefault();
-                    const formData = new FormData(e.target);
-                    const skillsInput = formData.get('skills');
-                    const skills = skillsInput.split('\n').filter(s => s.trim()).map(line => {
-                      const [name, level, category] = line.split(',').map(s => s.trim());
-                      return { name, level: level || 'Intermediate', category: category || 'General' };
-                    });
-                    
-                    const newEmployee = {
-                      id: employees.length ? Math.max(...employees.map(emp => emp.id || 0)) + 1 : 1,
-                      name: formData.get('name'),
-                      department: formData.get('department'),
-                      team: formData.get('team'),
-                      role: formData.get('role'),
-                      availability: formData.get('availability'),
-                      skills,
-                      growthAreas: parseGrowthAreas(formData.get('growthAreas') || '')
-                    };
-                    saveEmployees([...employees, newEmployee]);
-                    setShowAddEmployee(false);
-                  }}>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Name</label>
-                        <input name="name" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Role</label>
-                        <input name="role" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Business Unit</label>
-                        <input name="department" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Team</label>
-                        <input name="team" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
-                      </div>
-                      <div className="col-span-2">
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Availability</label>
-                        <select name="availability" required className="w-full px-3 py-2 border border-slate-300 rounded-lg">
-                          <option value="Available">Available</option>
-                          <option value="Partially Available">Partially Available</option>
-                          <option value="Busy">Busy</option>
-                        </select>
-                      </div>
-                      <div className="col-span-2">
-                        <label className="block text-sm font-medium text-slate-700 mb-1">
-                          Skills (one per line: name, level, category)
-                        </label>
-                        <textarea 
-                          name="skills" 
-                          required 
-                          rows="6"
-                          className="w-full px-3 py-2 border border-slate-300 rounded-lg font-mono text-sm"
-                          placeholder="React, Expert, Programming&#10;TypeScript, Advanced, Programming&#10;Node.js, Intermediate, Backend"
-                        />
-                        <p className="text-xs text-slate-500 mt-1">Format: SkillName, Level, Category</p>
-                      </div>
-                      <div className="col-span-2">
-                        <label className="block text-sm font-medium text-slate-700 mb-1">
-                          Skills/Business Areas to Learn (comma or new line separated)
-                        </label>
-                        <textarea
-                          name="growthAreas"
-                          rows="3"
-                          className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm"
-                          placeholder="Cybersecurity\nCommercial Strategy"
-                        />
-                      </div>
-                    </div>
-                    <div className="mt-6 flex gap-3">
-                      <button type="submit" className="flex-1 px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700">
-                        Add Employee
-                      </button>
-                      <button type="button" onClick={() => setShowAddEmployee(false)} className="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50">
-                        Cancel
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
 
         {showEmailModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowEmailModal(false)}>
